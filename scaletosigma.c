@@ -195,8 +195,7 @@ char    **logfile)
         char  *myoptions = "r:c:f:l:t:F:L:"; /* options to search for. :--> needs
                                             an argument*/
 char *USAGE =
-"Usage: scaletosigma -r numrows -c numcols -f firstcol -l lastcol \n
-		             -F firstRow -L lastRow  -t tmpfile";
+"Usage: scaletosigma -r numrows -c numcols -f firstcol -l lastcol \n -F firstRow -L lastRow  -t tmpfile";
 
         opterr = 0;                             /* turn off there message*/
 /* 
