@@ -232,7 +232,7 @@ int     codenum)                        /* to use*/
                code_info->num_reg=13;
                code_info->len    = pow(2.0,13.0) - 1. + .5;
                code_info->num_fdback=4;
-               code_info->fdback[0]=8;
+               code_info->fdback[0]=9;
                code_info->fdback[1]=10;
                code_info->fdback[2]=12;
                code_info->fdback[3]=13;
@@ -257,7 +257,7 @@ int     codenum)                        /* to use*/
                code_info->num_reg=16;
                code_info->len    = pow(2.0,16.0) - 1. + .5;
                code_info->num_fdback=4;
-               code_info->fdback[0]=9;
+               code_info->fdback[0]=11;
                code_info->fdback[1]=13;
                code_info->fdback[2]=14;
                code_info->fdback[3]=16;
