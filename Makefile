@@ -2,7 +2,7 @@
 #	Make one or more programs from the source
 #       executables will be placed in GLOBDIR
 #
-HOME=/home/pfs
+# HOME=/home/pfs
 SHELL=/bin/csh
 GLOBDIR=$(HOME)/bin
 CFLAGS=-O4 -I. -I${HOME}/include  -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
