@@ -10,10 +10,19 @@ FFLAGS=-O
 LPATH=$(HOME)/lib
 CC=gcc
 
-all: radardecode rotate radarfft radarcplxfft selectpnts comppncode compdsncode compbarkercode scaletosigma makefits mapsmerge avgdata
+all: scripts radardecode rotate radarfft radarcplxfft selectpnts comppncode compdsncode compbarkercode scaletosigma makefits mapsmerge avgdata 
 
-selectpnts: selectpnts.c writen.o read_pipe.o
-	$(CC) $(CFLAGS) selectpnts.c writen.o read_pipe.o -lm -o $(GLOBDIR)/selectpnts
+scripts: scripts/*
+	chmod u+w scripts/*
+	cp scripts/*.sc $(GLOBDIR)
+	cp scripts/*.awk $(GLOBDIR)
+
+radardecode: radardecode.c fftwAo.o unpriV_f4.o read_pipe.o timerstart.o timervalue.o
+	$(CC) $(CFLAGS) radardecode.c fftwAo.o unpriV_f4.o read_pipe.o timerstart.o timervalue.o -L$(LPATH) ../pfs/libunpack.o -lfftw -lm -o $(GLOBDIR)/radardecode
+#
+
+rotate: rotate.c read_pipe.o
+	$(CC) $(CFLAGS) rotate.c read_pipe.o -lm -o $(GLOBDIR)/rotate
 
 radarfft: radarfft.c fftwAo.o read_pipe.o
 	$(CC) $(CFLAGS) radarfft.c fftwAo.o read_pipe.o -L$(LPATH) -lfftw -lm -o $(GLOBDIR)/radarfft
@@ -21,20 +30,8 @@ radarfft: radarfft.c fftwAo.o read_pipe.o
 radarcplxfft: radarcplxfft.c 
 	$(CC) $(CFLAGS) radarcplxfft.c fftwAo.o read_pipe.o -L$(LPATH) -lfftw -lm -o $(GLOBDIR)/radarcplxfft
 
-rotate: rotate.c read_pipe.o
-	$(CC) $(CFLAGS) rotate.c read_pipe.o -lm -o $(GLOBDIR)/rotate
-
-makefits: makefits.c read_pipe.o fitsCmpScl.o fitsOutData.o fitsOutHdr.o
-	$(CC) $(CFLAGS) makefits.c read_pipe.o fitsCmpScl.o fitsOutData.o fitsOutHdr.o -lm -o $(GLOBDIR)/makefits
-
-scaletosigma: scaletosigma.c read_pipe.o
-	$(CC) $(CFLAGS) scaletosigma.c read_pipe.o -lm -o $(GLOBDIR)/scaletosigma
-
-avgdata: avgdata.c read_pipe.o
-	$(CC) $(CFLAGS) avgdata.c read_pipe.o -lm -o $(GLOBDIR)/avgdata
-
-mapsmerge: mapsmerge.c
-	$(CC) $(CFLAGS) mapsmerge.c -lm -o $(GLOBDIR)/mapsmerge
+selectpnts: selectpnts.c writen.o read_pipe.o
+	$(CC) $(CFLAGS) selectpnts.c writen.o read_pipe.o -lm -o $(GLOBDIR)/selectpnts
 
 comppncode: comppncode.c
 	$(CC) $(CFLAGS) comppncode.c -lm -o $(GLOBDIR)/comppncode
@@ -44,12 +41,19 @@ compdsncode: compdsncode.c
 
 compbarkercode: compbarkercode.c
 	$(CC) $(CFLAGS) compbarkercode.c -lm -o $(GLOBDIR)/compbarkercode
-# 
-#   	radar decoding filter  newer version with -m for cbr, pfs, unpacked
-#
-radardecode: radardecode.c fftwAo.o unpriV_f4.o read_pipe.o timerstart.o timervalue.o
-	$(CC) $(CFLAGS) radardecode.c fftwAo.o unpriV_f4.o read_pipe.o timerstart.o timervalue.o -L$(LPATH) ../pfs/libunpack.o -lfftw -lm -o $(GLOBDIR)/radardecode
-#
+
+scaletosigma: scaletosigma.c read_pipe.o
+	$(CC) $(CFLAGS) scaletosigma.c read_pipe.o -lm -o $(GLOBDIR)/scaletosigma
+
+makefits: makefits.c read_pipe.o fitsCmpScl.o fitsOutData.o fitsOutHdr.o
+	$(CC) $(CFLAGS) makefits.c read_pipe.o fitsCmpScl.o fitsOutData.o fitsOutHdr.o -lm -o $(GLOBDIR)/makefits
+
+mapsmerge: mapsmerge.c
+	$(CC) $(CFLAGS) mapsmerge.c -lm -o $(GLOBDIR)/mapsmerge
+
+avgdata: avgdata.c read_pipe.o
+	$(CC) $(CFLAGS) avgdata.c read_pipe.o -lm -o $(GLOBDIR)/avgdata
+
 
 fftwAo.o:	 fftwAo.c ;     $(CC) $(CFLAGS) -c fftwAo.c
 writen.o:	 writen.c ;     $(CC) $(CFLAGS) -c writen.c
