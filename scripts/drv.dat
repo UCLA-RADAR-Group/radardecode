@@ -1,0 +1,53 @@
+# example drv.dat.
+# key                    value            programs that use it
+#
+#
+fbase   /tmp/trash    drv_decode.sc drv_decodepwr.sc
+#                     drv_decodeskip.sc  drv_fft_pwr.sc
+#                     drv_fft_pwr_add.sc drv_invert.sc
+#                     drv_power.sc        map_sel.sc
+#                     movefiles.sc        tapetodisc.sc
+#
+tapedev     /dev/nrst12
+codelen     65535     drv_decode.sc     drv_decodepwr.sc
+#                     drv_decodeskip.sc
+#
+bits            8     drv_decode.sc       drv_decodepwr.sc
+#                     drv_decodeskip.sc
+#
+numpol          1     drv_decode.sc   drv_decodepwr.sc
+#                     drv_decodeskip.sc
+#
+poltouse        1     only makes a dif if numpol==2
+bin1            1     drv_decode.sc       drv_decodeskip.sc
+#
+numbins     65535     drv_decode.sc   drv_decodeskip.sc
+smpperbaud      1     drv_mapmsc.sc test_drv_decode.sc
+#			
+machine      bytes       ri,cbr,pfs,bytes,floats
+dcdpacked    0        0, or 1,2,4 samples/32bit word
+#                     drv_invert.sc   drv_power.sc
+#
+dcdfftlen   131072    drv_decode.sc   drv_decodepwr.sc
+#                     drv_decodeskip.sc
+#
+codestodecode 999999  drv_decode.sc     drv_decodepwr.sc
+removedc        1     remove dc prior to decoding
+#                     drv_decodeskip.sc
+#
+cohavg      0         not used yet...    drv_decodepwr.sc    drv_power.sc
+#
+spcfftlen   512       drv_pwr_fft.sc
+spcfftkeep  512       drv_pwr_fft.sc save # frqs about dec
+compcodeprog /home/margot/bin/comppncode
+#
+#   suffixes for programs..
+#   see end of README for who uses what
+#
+sufraw      raw
+sufdcd      dcd
+suftrn      trn
+sufspc      map
+sufeng          eng
+sufpha          pha
+sufscl          maps

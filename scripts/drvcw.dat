@@ -1,0 +1,23 @@
+#--> user must specify. others could be obtained from header
+#
+# key                    value            programs that use it
+#
+inpfile     /share/olda/datafile.16aug98.sbastcw.1
+fbase  		/share/olda/sband/Ast/aug16cw64k
+#
+bits    	12	
+#				
+numpol     	2		  
+#				     
+spcfftlen  	65536
+#
+#  first/last rec of each scan to process
+#
+firstrec    1
+lastrec     2000000000
+#
+#	suffixes for programs..
+#	see end of README for who uses what
+#
+cwsufspc		spc		     
+cwsufcat		spcall    
