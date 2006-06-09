@@ -12,7 +12,9 @@ CC=gcc
 
 all: scripts radardecode rotate radarfft radarcplxfft selectpnts comppncode compdsncode compbarkercode scaletosigma makefits mapsmerge avgdata 
 
-scripts: radardecode.c
+FORCE:
+	
+scripts: FORCE
 	chmod u+w scripts/*
 	cp scripts/*.sc $(GLOBDIR)
 	cp scripts/*.awk $(GLOBDIR)
