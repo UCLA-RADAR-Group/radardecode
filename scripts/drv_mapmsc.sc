@@ -33,6 +33,7 @@ set usage="Usage drv_mapmsc.sc {-s col1 col2 -S row1 row2} file1 numFiles toAvg 
 #
 #	should we rescale the the maps files ??
 #
+touch $hdr
 echo "drv_mapmsc.sc START       :`date`" >>  $hdr
 set doneopt=0
 while ( $doneopt == 0 ) 
