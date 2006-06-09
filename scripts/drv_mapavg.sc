@@ -1,3 +1,4 @@
+#!/bin/tcsh
 #
 #	drv_mapavg.sc   firstfile numfiles filesavg filenumout {maps,map}
 #	..   
@@ -48,6 +49,7 @@ endif
 #
 while ( $numloop > 0 )
 rm -f $tmpfile
+touch $tmpfile
 set outfile="${outbase}${fnumout}"
 #     
 #  1. push files to avg for 1 map to temp file
