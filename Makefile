@@ -10,7 +10,7 @@ FFLAGS=-O
 LPATH=$(HOME)/lib
 CC=gcc
 
-all: scripts radardecode rotate radarfft radarcplxfft selectpnts comppncode compdsncode compbarkercode scaletosigma makefits mapsmerge avgdata 
+all: scripts radardecode rotate radarfft radarcplxfft selectpnts comppncode compdsncode compbarkercode scaletosigma makefits mapsmerge avgdata stripVme
 
 FORCE:
 	
@@ -56,6 +56,8 @@ mapsmerge: mapsmerge.c
 avgdata: avgdata.c read_pipe.o
 	$(CC) $(CFLAGS) avgdata.c read_pipe.o -lm -o $(GLOBDIR)/avgdata
 
+stripVme: stripVme.c read_pipe.o hdrLib.h
+	$(CC) $(CFLAGS) -DLINUX stripVme.c read_pipe.o -o $(GLOBDIR)/stripVme
 
 fftwAo.o:	 fftwAo.c ;     $(CC) $(CFLAGS) -c fftwAo.c
 writen.o:	 writen.c ;     $(CC) $(CFLAGS) -c writen.c
