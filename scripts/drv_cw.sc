@@ -52,6 +52,7 @@ while ( $numloop > 0 )
 set fifoToUse=1
 while ( $fifoToUse <= $numpol ) 
 	set outfile="${basefile}.${sufout}p${fifoToUse}f$1_$flast"
+	touch $outfile
 	stripVme -h -o $fnum -n 1 -g "$firstrec $lastrec" < $inpfile |\
 	unpriVtoi4 -b $bits -i $numpol -f $fifoToUse -d 3|\
 	i4tor4|zerofill -n -b 8 -i $fftlen -o $fftlen|\
