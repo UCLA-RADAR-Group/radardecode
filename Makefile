@@ -10,7 +10,7 @@ FFLAGS=-O
 LPATH=$(HOME)/lib
 CC=gcc
 
-all: scripts radardecode rotate radarfft radarcplxfft selectpnts comppncode compdsncode compbarkercode scaletosigma makefits mapsmerge avgdata stripVme
+all: scripts radardecode rotate radarfft radarcplxfft selectpnts comppncode compdsncode compbarkercode scaletosigma makefits mapsmerge avgdata stripVme unpriVtoi4 i4tor4
 
 FORCE:
 	
@@ -62,6 +62,8 @@ stripVme: stripVme.c read_pipe.o hdrLib.h
 unpriVtoi4: unpriVtoi4.c read_pipe.o unpriV_i4.o
 	$(CC) $(CFLAGS) unpriVtoi4.c read_pipe.o unpriV_i4.o -o $(GLOBDIR)/unpriVtoi4
 
+i4tor4: i4tor4.c
+	$(CC) $(CFLAGS) i4tor4.c -lm -o $(GLOBDIR)/i4tor4
 
 fftwAo.o:	 fftwAo.c ;     $(CC) $(CFLAGS) -c fftwAo.c
 writen.o:	 writen.c ;     $(CC) $(CFLAGS) -c writen.c
