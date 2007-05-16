@@ -10,7 +10,7 @@ FFLAGS=-O
 LPATH=$(HOME)/lib
 CC=gcc
 
-all: scripts radardecode rotate radarfft radarcplxfft selectpnts comppncode compdsncode compbarkercode scaletosigma makefits mapsmerge avgdata stripVme unpriVtoi4 i4tor4 zerofill fftfilter
+all: scripts radardecode rotate radarfft radarcplxfft selectpnts comppncode compdsncode compbarkercode scaletosigma makefits mapsmerge avgdata stripVme unpriVtoi4 i4tor4 zerofill fftfilter power
 
 FORCE:
 	
@@ -68,9 +68,11 @@ i4tor4: i4tor4.c
 zerofill: zerofill.c read_pipe.o
 	$(CC) $(CFLAGS) zerofill.c read_pipe.o -lm -o $(GLOBDIR)/zerofill
 
-fftfilter: fftfilter.c fftwAo.o
-	$(CC) $(CFLAGS) fftfilter.c fftwAo.o read_pipe.o -lfftw -lm -o $(GLOBDIR)/fftfilter
+fftfilter: fftfilter.c fftwAo.o read_pipe.o 
+	$(CC) $(CFLAGS) fftfilter.c fftwAo.o read_pipe.o -L$(LPATH) -lfftw -lm -o $(GLOBDIR)/fftfilter
 
+power: power.c read_pipe.o 
+	$(CC) $(CFLAGS) power.c read_pipe.o -lm -o $(GLOBDIR)/power
 
 fftwAo.o:	 fftwAo.c ;     $(CC) $(CFLAGS) -c fftwAo.c
 writen.o:	 writen.c ;     $(CC) $(CFLAGS) -c writen.c
