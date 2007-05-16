@@ -10,7 +10,7 @@ FFLAGS=-O
 LPATH=$(HOME)/lib
 CC=gcc
 
-all: scripts radardecode rotate radarfft radarcplxfft selectpnts comppncode compdsncode compbarkercode scaletosigma makefits mapsmerge avgdata stripVme unpriVtoi4 i4tor4
+all: scripts radardecode rotate radarfft radarcplxfft selectpnts comppncode compdsncode compbarkercode scaletosigma makefits mapsmerge avgdata stripVme unpriVtoi4 i4tor4 zerofill
 
 FORCE:
 	
@@ -64,6 +64,9 @@ unpriVtoi4: unpriVtoi4.c read_pipe.o unpriV_i4.o
 
 i4tor4: i4tor4.c
 	$(CC) $(CFLAGS) i4tor4.c -lm -o $(GLOBDIR)/i4tor4
+
+zerofill: zerofill.c read_pipe.o
+	$(CC) $(CFLAGS) zerofill.c read_pipe.o -lm -o $(GLOBDIR)/zerofill
 
 fftwAo.o:	 fftwAo.c ;     $(CC) $(CFLAGS) -c fftwAo.c
 writen.o:	 writen.c ;     $(CC) $(CFLAGS) -c writen.c
