@@ -43,6 +43,7 @@ rm -f $outfile1
 rm -f $outfile2
 #set
 #setenv
+touch $hdr
 echo "drv_cw.sc START       : `date`" >> $hdr
 while ( $numloop > 0 )
 #     
