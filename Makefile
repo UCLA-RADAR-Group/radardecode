@@ -59,9 +59,14 @@ avgdata: avgdata.c read_pipe.o
 stripVme: stripVme.c read_pipe.o hdrLib.h
 	$(CC) $(CFLAGS) -DLINUX stripVme.c read_pipe.o -o $(GLOBDIR)/stripVme
 
+unpriVtoi4: unpriVtoi4.c read_pipe.o unpriV_i4.o
+	$(CC) $(CFLAGS) unpriVtoi4.c read_pipe.o unpriV_i4.o -o $(GLOBDIR)/unpriVtoi4
+
+
 fftwAo.o:	 fftwAo.c ;     $(CC) $(CFLAGS) -c fftwAo.c
 writen.o:	 writen.c ;     $(CC) $(CFLAGS) -c writen.c
 unpriV_f4.o:	 unpriV_f4.c ;  $(CC) $(CFLAGS) -c unpriV_f4.c
+unpriV_i4.o:	 unpriV_i4.c ;  $(CC) $(CFLAGS) -c unpriV_i4.c
 read_pipe.o:	 read_pipe.c ;	$(CC) $(CFLAGS) -c read_pipe.c
 fitsCmpScl.o:	 fitsCmpScl.c ; $(CC) $(CFLAGS) -c fitsCmpScl.c
 fitsOutData.o:	 fitsOutData.c ;$(CC) $(CFLAGS) -c fitsOutData.c
