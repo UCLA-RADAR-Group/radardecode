@@ -5,7 +5,7 @@
 # HOME=/home/pfs
 SHELL=/bin/csh
 GLOBDIR=$(HOME)/bin
-CFLAGS=-O4 -I. -I${HOME}/include  -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
+CFLAGS=-O4 -I. -I${HOME}/include  -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DLINUX
 FFLAGS=-O
 LPATH=$(HOME)/lib
 CC=gcc
@@ -57,7 +57,7 @@ avgdata: avgdata.c read_pipe.o
 	$(CC) $(CFLAGS) avgdata.c read_pipe.o -lm -o $(GLOBDIR)/avgdata
 
 stripVme: stripVme.c read_pipe.o hdrLib.h
-	$(CC) $(CFLAGS) -DLINUX stripVme.c read_pipe.o -o $(GLOBDIR)/stripVme
+	$(CC) $(CFLAGS) stripVme.c read_pipe.o -o $(GLOBDIR)/stripVme
 
 unpriVtoi4: unpriVtoi4.c read_pipe.o unpriV_i4.o
 	$(CC) $(CFLAGS) unpriVtoi4.c read_pipe.o unpriV_i4.o -o $(GLOBDIR)/unpriVtoi4
