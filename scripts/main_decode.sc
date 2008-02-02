@@ -210,7 +210,7 @@ echo $decodeprog  -b $bits -c $codelen -l $fftlen -n $numcodes -o .5 -s $smpperb
 # jlm changes ri dual-pol option to cohavg option
 # ri dual-pol data no longer supported
 # if you really want it, uncomment previous 5-line block and comment out next 5-line block
-if (`expr  \( $cohavg > 1 \)`) then 
+if (`expr  \( $cohavg \> 1 \)`) then 
         dd if=$inputfile bs=64k | \
  $decodeprog  -b $bits -c $codelen -l $fftlen -n $numcodes -o .5 -s $smpperbaud  $rmdc $debugopt -m $machinetype -p $numpol $pol -a $codeprog |\
 	avgdata -d r4 -g $codelen2 -h $cohavg |\
