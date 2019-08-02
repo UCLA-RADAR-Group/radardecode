@@ -4,7 +4,7 @@ The goals of this repository are to facilitate the maintenance and improve the p
 
 # Installation procedure
 
-- % git pull https://github.com/UCLA-RADAR-Group/radardecode
+- % git clone https://github.com/UCLA-RADAR-Group/radardecode
 - Specify installation directory in Makefile
 - % make 
 
