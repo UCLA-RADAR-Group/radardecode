@@ -1,9 +1,9 @@
 #!/bin/sh
 #
-#	awk script to extrace a keyword value from a file 
+#	awk script to extract a keyword value from a file 
 #	 
 #	call: 
-#	key.awk file  keyword
+#	ex.awk file  keyword
 #
 #	output is keyword value or null
 #
@@ -14,7 +14,7 @@
 #
 if [ $# -lt 2 ] 
    then
-   echo "Usage: key.awk file keyword"
+   echo "Usage: ex.awk file keyword"
    exit 1
 fi
 awk  ' BEGIN {

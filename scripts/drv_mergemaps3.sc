@@ -1,10 +1,11 @@
 #
-# drv_mergemaps3.sc [-f fitsFilename] firstfile numfiles colcenOff newcollen newrnglen mapsperrow 
+# drv_mergemaps3.sc [-F] [-f fitsFilename] firstfile numfiles colcenOff newcollen newrnglen mapsperrow 
 #	..   
 #	merge maps together. use scaled maps files.
 #   will take a subset of range, freq.. and will allow an offset in freq
 #   from the center of the map.
 #	
+#   [-F] flip top to bottom
 #   [-f fitsfilename] make a fits file rather than a float output map
 #	firstfile... $infilexx 
 #   numfiles ... to read in
@@ -16,7 +17,14 @@
 # 27may99 .. removed zoom, revmoed -r, added -f make fits file
 #	
 # set verbose
+unset noclobber
+unalias rm
+unalias mv
 set sufout="img"
+set Flip=""
+if ( "$1" == "-F") then
+    set Flip=" -f "
+endif
 set makFits=0
 if ( "$1" == "-f") then
 	set makFits=1
@@ -87,7 +95,7 @@ end
 if ($makFits == 1) then
 @ bigcol= $mapsinrow * ( $newfrqlen + 1 )
 @ bigrow= ( ( $numfiles + $mapsinrow - 1 ) / $mapsinrow ) * ( $newrnglen + 1 )
-	makefits -f -c $bigcol -r $bigrow < $outfile > $fitsName
+	makefits $Flip -c $bigcol -r $bigrow < $outfile > $fitsName
 	rm $outfile
     echo "fits file :$fitsName rng:$newrnglen frq:$newfrqlen"
 else 

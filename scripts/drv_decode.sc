@@ -1,3 +1,5 @@
+#!/bin/csh
+unset noclobber
 #  25may99 testing out radardecodeN with multiple samples/baud
 #
 #	driver program for main_decode.sc
@@ -10,6 +12,7 @@
 #       history:
 #	3/5/92 . chmod .dcd file to 0444 so we can't accidently delete it.
 #   4aug99 .. mods for -m cbr -p numpol poltouse
+#   9feb12   print byteorder to hdr file
 #set verbose
 #set echo
 set remfile=0
@@ -32,8 +35,7 @@ set numbins=`ex.awk $DRVSB numbins`
 set dcdfftlen=`ex.awk $DRVSB dcdfftlen`
 set codestodecode=`ex.awk $DRVSB codestodecode`
 set removedc=`ex.awk $DRVSB removedc`
-set codeprog=`ex.awk $DRVSB compcodeprog`
-set cohavg=`ex.awk $DRVSB cohavg`
+set codeprog=`ex.awk $DRVSB codeprog`
 # set unpacked=`ex.awk $DRVSB unpacked`
 set machine=`ex.awk $DRVSB machine`
 if ( "$smpperbaud" == "" ) then
@@ -54,7 +56,23 @@ while ( $numloop > 0 )
 set hdr=${fbase}.hdrf$fnum
 set infile=${fbase}.${sufin}f$fnum
 set outfile=${fbase}.${sufout}f$fnum
+#
+#  append info to header file...
+#
 echo "drv_decode.sc START            :`date`" >>  $hdr
+printbyteorder "    decoding byteorder         :" >> $hdr
+echo "    decoding progam            : $decodeprog ">> $hdr
+echo "    1st range bin kept         : $bin1" >> $hdr
+echo "    number of range bins kept  : $numbins" >> $hdr
+echo "    samples per baud           : $smpperbaud" >> $hdr
+echo "    numPol, pol Used           : $numpol,$pol" >> $hdr
+echo "    fftlength used for decoding: $dcdfftlen" >> $hdr
+echo "    remove Dc                  : $removedc"  >> $hdr
+echo "    machine                    : $machine "  >> $hdr
+echo "    codeprog                   : $codeprog "  >> $hdr
+echo "    maximum # codes to decode  : $codestodecode">> $hdr
+echo "    input file                 : ${infile} " >> $hdr
+echo "    output file                : ${outfile}" >> $hdr
 #
 main_decode.sc <<Eof
 ${infile}
@@ -69,30 +87,13 @@ ${numbins}
 ${dcdfftlen}
 ${codestodecode}
 ${removedc}
-${cohavg}
 ${machine}
 ${codeprog}
 Eof
 
-if ( "$remfile" == "1" ) rm ${infile}
+if ( "$remfile" == "1" ) /bin/rm ${infile}
 echo "Done with ${infile}"
-chmod 0664 ${outfile}
-#
-#  append info to header file...
-#
-echo "    decoding progam            : $decodeprog ">> $hdr
-echo "    1st range bin kept         : $bin1" >> $hdr
-echo "    number of range bins kept  : $numbins" >> $hdr
-echo "    samples per baud           : $smpperbaud" >> $hdr
-echo "    numPol, pol Used           : $numpol,$pol" >> $hdr
-echo "    fftlength used for decoding: $dcdfftlen" >> $hdr
-echo "    remove Dc                  : $removedc"  >> $hdr
-echo "    coherent average pre FFT   : $cohavg "  >> $hdr
-echo "    machine                    : $machine "  >> $hdr
-echo "    codeprog                   : $codeprog "  >> $hdr
-echo "    maximum # codes to decode  : $codestodecode">> $hdr
-echo "    input file                 : ${infile} " >> $hdr
-echo "    output file                : ${outfile}" >> $hdr
+chmod 0444 ${outfile}
 echo "drv_decode.sc  END             :`date`" >>  $hdr
 @ fnum=$fnum + 1
 @ numloop=$numloop - 1
