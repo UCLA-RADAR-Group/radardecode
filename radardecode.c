@@ -4,7 +4,7 @@
 #include	 	<string.h>
 #include		<riLib.h>
 #include		<philLib.h>
-#include		<../pfs/unpack.h>
+#include		<unpack.h>
 /*
  *      decode an input stream of radar data.                    
  *      
