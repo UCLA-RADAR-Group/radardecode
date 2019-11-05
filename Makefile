@@ -20,7 +20,7 @@ scripts: FORCE
 	cp scripts/*.awk $(GLOBDIR)
 
 radardecode: radardecode.c fftwAo.o unpriV_f4.o read_pipe.o timerstart.o timervalue.o
-	$(CC) $(CFLAGS) radardecode.c fftwAo.o unpriV_f4.o read_pipe.o timerstart.o timervalue.o -L$(LPATH) ../pfs/libunpack.o -lfftw -lm -o $(GLOBDIR)/radardecode
+	$(CC) $(CFLAGS) radardecode.c fftwAo.o unpriV_f4.o read_pipe.o timerstart.o timervalue.o -L$(LPATH) libunpack.o -lfftw -lm -o $(GLOBDIR)/radardecode
 #
 
 rotate: rotate.c read_pipe.o
