@@ -11,6 +11,7 @@ The goals of this repository are to facilitate the maintenance and improve the p
 # Test 
  In Ubuntu 18.10
 	need "make", "csh", "gcc", fftw library version 2 (2.1.5 works)
+	a ~/bin folder
 
 # Task list
 
