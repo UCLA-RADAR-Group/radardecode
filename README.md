@@ -10,13 +10,12 @@ The goals of this repository are to facilitate the maintenance and improve the p
 
 # Test 
  In Ubuntu 18.10
-	need "make", "csh", "gcc", fftw library version 2 (2.1.5 works)
-	a ~/bin folder
+	need "make", "csh", "gcc", fftw library version 2 (2.1.5 works) ,a ~/bin folder
 
 # Task list
 
 - [ ] Most of this code was collected from multiple directories into a single location around 2005.  Current versions of the programs from /pkg/aosoft/common/bin/ and elsewhere should be integrated.
-- [ ] Some of this code probably relies on version 2 of the FFTW library.  Changes should be made to support version 3 of the FFTW library.   
+- [ ] Some of this code probably relies on version 2 of the FFTW library.  Changes should be made to support version 3 of the FFTW library.   (branch and . work)
 - [ ] A validation procedure should be added to enable testing of new installations.  
 
 - [ ] warnings when making
