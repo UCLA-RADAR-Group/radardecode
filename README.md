@@ -18,9 +18,9 @@ The goals of this repository are to facilitate the maintenance and improve the p
 - [ ] Some of this code probably relies on version 2 of the FFTW library.  Changes should be made to support version 3 of the FFTW library.   (branch and . work)
 - [ ] A validation procedure should be added to enable testing of new installations.  
 
-- [ ] warnings when making
-- [ ] original code for libunpack.o and make same
-
+- [ ] initial bin folder creation or a special folder . eliminate the manual step
+- [ ] warnings when making (related to adding string.h stdlib.h)
+- [ ] check which unpack.h is best and make changes in unp_pfs_pc_edt.c accordingly
 # Credits
 
 Most of the software was initially written by Phil Perillat.  
