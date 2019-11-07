@@ -10,7 +10,7 @@ FFLAGS=-O
 LPATH=$(HOME)/lib
 CC=gcc
 
-all: scripts radardecode rotate radarfft radarcplxfft selectpnts comppncode compdsncode compbarkercode scaletosigma makefits mapsmerge avgdata stripVme unpriVtoi4 i4tor4 zerofill fftfilter power
+all: libunpack scripts radardecode rotate radarfft radarcplxfft selectpnts comppncode compdsncode compbarkercode scaletosigma makefits mapsmerge avgdata stripVme unpriVtoi4 i4tor4 zerofill fftfilter power
 
 FORCE:
 	
@@ -18,6 +18,8 @@ scripts: FORCE
 	chmod u+w scripts/*
 	cp scripts/*.sc $(GLOBDIR)
 	cp scripts/*.awk $(GLOBDIR)
+
+libunpack:     unp_pfs_pc_edt.c; $(CC) $(CFLAGS) -c unp_pfs_pc_edt.c -o libunpack.o
 
 radardecode: radardecode.c fftwAo.o unpriV_f4.o read_pipe.o timerstart.o timervalue.o
 	$(CC) $(CFLAGS) radardecode.c fftwAo.o unpriV_f4.o read_pipe.o timerstart.o timervalue.o -L$(LPATH) libunpack.o -lfftw -lm -o $(GLOBDIR)/radardecode
