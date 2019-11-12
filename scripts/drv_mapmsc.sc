@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/bin/csh
 #                       1      2        3      4          5             6   7
 #drv_mapmsc.sc {opts} file1 numfiles toavg map/row 
 #                     {newRowLen} {newColLen}{colOff}
@@ -16,7 +16,6 @@
 #   colOffset column offset for maps
 # ----------------
 #set verbose
-unset noclobber
 set basefile=`ex.awk $DRVSB fbase`
 set    sufin=`ex.awk $DRVSB sufscl`
 set  rngbins=`ex.awk $DRVSB numbins`
@@ -34,7 +33,8 @@ set usage="Usage drv_mapmsc.sc {-s col1 col2 -S row1 row2} file1 numFiles toAvg 
 #
 #	should we rescale the the maps files ??
 #
-echo "drv_mapmsc.sc START       :`date`" >>!  $hdr
+touch $hdr
+echo "drv_mapmsc.sc START       :`date`" >>  $hdr
 set doneopt=0
 while ( $doneopt == 0 ) 
 	if ( "$1" == "-s") then
@@ -84,17 +84,12 @@ endif
 @ numRows= (($numfiles / $filesToAvg ) + $mapsPerRow - 1 ) / $mapsPerRow
 set  bname=`basename $basefile`
 set  dname=`dirname $basefile`
-
-if ( ! -e Fits ) then
-	mkdir Fits
-endif
-
 #
-#if ( $numfiles == 1 ) then
-#	set  fitsName=$dname/Fits/f${file1}.fit
-#else
+if ( $numfiles == 1 ) then
+	set  fitsName=$dname/Fits/f${file1}.fit
+else
 	set  fitsName=$dname/Fits/f${numRows}x${mapsPerRow}.fit
-#endif
+endif
 #
 #  if we make the maps files, to it here
 #
@@ -102,21 +97,21 @@ if ( $makemaps != 0 ) then
 	drv_scale.sc $file1 $numfiles $col1scale $col2scale $row1scale $row2scale
 endif
 #
-# if we avg maps.. store averages in $tempavg$$.n
-#
-#if ( $filesToAvg > 1 ) then
-	set fileNumOut=900
-	drv_mapavg.sc $file1 $numfiles $filesToAvg $fileNumOut maps
-#else 
-#	set fileNumOut=$file1
-#endif
-@ mapsInMos= $numfiles / $filesToAvg 
-#
 # if we rotate the maps files, do it 
 #
 if ( $torotate != 0 ) then
-	drv_rotrange.sc 900 $mapsInMos $torotate
+	drv_rotrange.sc $file1 $numfiles $torotate
 endif
+#
+# if we avg maps.. store averages in $tempavg$$.n
+#
+if ( $filesToAvg > 1 ) then
+	set fileNumOut=900
+	drv_mapavg.sc $file1 $numfiles $filesToAvg $fileNumOut maps
+else 
+	set fileNumOut=$file1
+endif
+@ mapsInMos= $numfiles / $filesToAvg 
 #
 # now merge map create fits file
 #
@@ -125,13 +120,13 @@ drv_mergemaps3.sc -f $fitsName $fileNumOut $mapsInMos $colOffset $newRowLen $new
 # log in $fbase.mschdr what we did
 #
 #echo "headerfile:$hdr"
-echo "   basefile               : $basefile"         >>! $hdr
-echo "   fits filename          : $fitsName"        >>! $hdr
-echo "   1st file, numfiles     : $file1 $numfiles" >>! $hdr
-echo "   orig frq,range bins    : $frqbins $rngbins">>! $hdr
-echo "   kept frq,range bins    : $newRowLen $newColLen">>! $hdr
-echo "   frq bin offset,smp/baud: $colOffset $smpperbaud">>! $hdr
-echo "   rotate range bins      : $torotate" >>! $hdr
-echo "   maps avged             : $filesToAvg " >>! $hdr
-echo "   maps per row           : $mapsPerRow" >>! $hdr
-echo "drv_mapmsc.sc END         :" >>!  $hdr
+echo "   basefile               : $basefile"         >> $hdr
+echo "   fits filename          : $fitsName"        >> $hdr
+echo "   1st file, numfiles     : $file1 $numfiles" >> $hdr
+echo "   orig frq,range bins    : $frqbins $rngbins">> $hdr
+echo "   kept frq,range bins    : $newRowLen $newColLen">> $hdr
+echo "   frq bin offset,smp/baud: $colOffset $smpperbaud">> $hdr
+echo "   rotate range bins      : $torotate" >> $hdr
+echo "   maps avged             : $filesToAvg " >> $hdr
+echo "   maps per row           : $mapsPerRow" >> $hdr
+echo "drv_mapmsc.sc END         :" >>  $hdr

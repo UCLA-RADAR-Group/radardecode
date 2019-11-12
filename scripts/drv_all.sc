@@ -1,7 +1,4 @@
 #!/bin/csh
-#   17feb12   Move default scaling to drv_fft
-#   05jul11.. Change default to not delete raw data, added default
-#             scaling MCN
 #   25may99.. testing radardecodeN .. with multiple samples/baud
 #             and transpose by block.
 #	do the entire processing step from dcd to  output maps
@@ -12,13 +9,9 @@
 #
 #	suffixes:   
 #set verbose
-set remfile=""
+set remfile="-d"
 if ( "$1" == "-n") then
 set remfile=""
-shift
-endif
-if ( "$1" == "-d") then
-set remfile="-d"
 shift
 endif
 #

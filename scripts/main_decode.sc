@@ -13,10 +13,6 @@
 #			  now have units of samples rather than bauds.
 #     4aug99 - changes for -m cbr ri unpacked, -p numPol poltouse
 #
-#    10Feb03  MCN fixed typos wrt codeprog
-#
-#    05jul11  MCN new radardecode doesn't let you use -a
-#
 #	set some variables
 #
 #set verbose
@@ -34,15 +30,15 @@
 #	fftlen		length fft to use in decoding
 #	numcodes	to process
 #	removeDc
-#	machinetype    ri,unpacked cbr 
-#   codeprog   /usr/local/bin/comppncode
+#	machinetype    ri,cbr,pfs,bytes,floats
+#   compcodeprog   /home/pfs/bin/comppncode
 #	
 set debugopt=""
 set decodeprog="radardecode"
 set validbits=(1 2  4 8 12)
 # sneak in 13 as a valid code since barker code 13 is used
 set validcodes=(1 3 7 13 15 31 63 127 255 511 1023 2047 4095 8191 16383 32767 65535 131071)
-set validlenfft=(2 4 8 16 32 64 128 256 512 1024 2048 4096 8192 16384 32768                      65536 131072 262144 524288 1048576 2097152)
+set validlenfft=(2 4 8 16 32 64 128 256 512 1024 2048 4096 8192 16384 32768                      65536 131072 262144 524288 1048576)
 #
 #	get input filename
 echo "Enter input filename"
@@ -159,9 +155,19 @@ else
 endif
 #echo "removedc: $rmdc"
 #
+#       get number of codes to incoherently  avg
+#
+echo "Enter number of codes to coherently add (1..)"
+set cohavg=$<
+    if ( `expr $cohavg \<= 0 `) then
+       echo "illegal number of coherent additions: $cohavg "
+       goto done
+    endif
+#
+#
 #	machine type
 #
-echo "machine type (ri,cbr,unpacked)"
+echo "machine type (ri,cbr,pfs,bytes,floats)"
 set machinetype=$<
 if ( $machinetype == 0) then
 	set machinetype="ri"
@@ -177,6 +183,7 @@ set codeprog=$<
 echo "codeprog: $codeprog"
 #
 set numffts=`expr 1 + $numcodes \* $codelenused / \( $fftlen - $codelenused + 1 \) `
+@ codelen2= $codelen * 2
 @ discsize=$numcodes * $numchan * 8
 echo "doing $numffts ffts to decode $numcodes codes"
 echo "disc file will be $discsize bytes"
@@ -192,15 +199,30 @@ echo "disc file will be $discsize bytes"
 #  set pol to 1 or 2 for pol 1 or 2. if only 
 echo " # pol=${numpol},using pol:${pol}. decode prog:${decodeprog}"
 echo "start:`date`."
-if ( `expr  \( $numpol = 2 \) \& \( $machinetype = "ri" \) ` ) then    
+# some verbosity added by jlm
+echo $decodeprog  -b $bits -c $codelen -l $fftlen -n $numcodes -o .5 -s $smpperbaud  $rmdc $debugopt -m $machinetype -p $numpol $pol -a $codeprog
+#if ( `expr  \( $numpol = 2 \) \& \( $machinetype = "ri" \) ` ) then    
+#        dd if=$inputfile bs=64k | \
+#	selectpnts -b 4 -f $pol -s $numpol | \
+#$decodeprog -b $bits -c $codelen -l $fftlen -n $numcodes -o .5 -s $smpperbaud    $rmdc -a $codeprog |\
+#	selectpnts -b 8 -f $chan1 -g $numchan -s $codelenused > $outputfile
+#
+# jlm changes ri dual-pol option to cohavg option
+# ri dual-pol data no longer supported
+# if you really want it, uncomment previous 5-line block and comment out next 5-line block
+if (`expr  \( $cohavg \> 1 \)`) then 
         dd if=$inputfile bs=64k | \
-	selectpnts -b 4 -f $pol -s $numpol | \
-$decodeprog -b $bits -c $codelen -l $fftlen -n $numcodes -o .5 -s $smpperbaud    $rmdc  |\
-	selectpnts -b 8 -f $chan1 -g $numchan -s $codelenused > $outputfile
+ $decodeprog  -b $bits -c $codelen -l $fftlen -n $numcodes -o .5 -s $smpperbaud  $rmdc $debugopt -m $machinetype -p $numpol $pol -a $codeprog |\
+	avgdata -d r4 -g $codelen2 -h $cohavg |\
+ 	selectpnts -b 8 -f $chan1 -g $numchan -s $codelenused > $outputfile
 else
         dd if=$inputfile bs=64k | \
- $decodeprog  -b $bits -c $codelen -l $fftlen -n $numcodes -o .5 -s $smpperbaud  $rmdc $debugopt -m $machinetype -p $numpol $pol  |\
+ $decodeprog  -b $bits -c $codelen -l $fftlen -n $numcodes -o .5 -s $smpperbaud  $rmdc $debugopt -m $machinetype -p $numpol $pol -a $codeprog |\
  	selectpnts -b 8 -f $chan1 -g $numchan -s $codelenused > $outputfile
 endif
 echo "end  :`date`"
+
+
+
 done:
+

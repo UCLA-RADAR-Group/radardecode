@@ -1,6 +1,4 @@
-#!/bin/sh 
-# \
-if [ -x /usr/S2local/bin/tclsh8.3 ];then exec /usr/S2local/bin/tclsh8.3 $0 "$@" ; else exec /usr/bin/tclsh $0 "$@" ;fi
+#!/usr/bin/tclsh
 #
 # drv_fft_pwr.sc [-d] firstfile numfiles
 #	..   
@@ -26,9 +24,9 @@ if [ -x /usr/S2local/bin/tclsh8.3 ];then exec /usr/S2local/bin/tclsh8.3 $0 "$@" 
 # 07aug99  - if dcdpacked, select the polarization of interest
 #			 assume headers on on input file
 #		     converted to be a tcl script
-# 09feb12    print byteorder
-# 17feb12    also run drv_scale so that we always make maps files MCN/PT
-#	
+#
+# 23apr01  - jlm eliminated rotate (frequency swap is done in radarfft)
+#
 #set verbose
 global tcl_precision
 set tcl_precision 17
@@ -48,6 +46,7 @@ set lenfft   [exec ex.awk $env(DRVSB) spcfftlen]
 set lenkeep  [exec ex.awk $env(DRVSB) spcfftkeep]
 set numpol   [exec ex.awk $env(DRVSB) numpol]
 set poltouse [exec ex.awk $env(DRVSB) poltouse]
+set xoff     [exec ex.awk $env(DRVSB) xoff]
 set dcdpacked [exec ex.awk $env(DRVSB) dcdpacked]
 if { ("$dcdpacked" == "") || ($dcdpacked == 0) } {
 	set dcdpacked 0
@@ -62,11 +61,9 @@ if { ( $argc  - $argi) != 2  } {
 }
 set fnum     [lindex $argv $argi]
 set numloop  [lindex $argv [expr $argi + 1 ]]
-set nfirst $fnum
-#set torotate [expr $lenkeep / 2 ]
-#radardecode now seems to leave DC in the middle. MCN2011Jul07
-#Won't work right if not decoding!
-set torotate [expr ( $lenkeep - $lenfft ) / 2 ]
+set torotate [expr $lenkeep / 2 ]
+set firsttokeep [expr ($lenfft - $lenkeep) / 2 + 1]
+
 #
 for { set i 0 } { $i < $numloop } { incr i } {
 #     
@@ -104,16 +101,14 @@ for { set i 0 } { $i < $numloop } { incr i } {
 		set retval [catch \
 {exec  stripVme -h -q  < $infile | selectpnts -b $datalen -f $poltouse -s 2 | \
 		radarfft -l $lenfft -r $numbins -p $dcdpacked | \
- 	    rotate -b 4 -i $lenfft -r $torotate | \
-        selectpnts -b 4 -g $lenkeep -s $lenfft     > $outfile } msg ]
+        selectpnts -b 4 -f $firsttokeep -g $lenkeep -s $lenfft     > $outfile } msg ]
 		puts "$msg"
 		flush stdout
 		} else {
 			set retval [catch \
 {exec  stripVme -h -q < $infile| \
 		radarfft -l $lenfft -r $numbins -p $dcdpacked | \
- 	    rotate -b 4 -i $lenfft -r $torotate | \
-        selectpnts -b 4 -g $lenkeep -s $lenfft     > $outfile } msg ]
+        selectpnts -b 4 -f $firsttokeep -g $lenkeep -s $lenfft     > $outfile } msg ]
 		puts $msg
 		flush stdout
 		}
@@ -134,14 +129,12 @@ for { set i 0 } { $i < $numloop } { incr i } {
 #		puts "lenfft: $lenfft numbins:$numbins dcdpacked:$dcdpacked"
 #		flush stdout
 		set retval [catch \
- 	    { exec radarfft -l $lenfft -r $numbins -p $dcdpacked < $infile | \
- 		rotate -b 4 -i $lenfft -r $torotate \
- 		| selectpnts -b 4 -g $lenkeep -s $lenfft     > $outfile } msg ]
+ 	    { exec radarfft -l $lenfft -r $numbins -p $dcdpacked -x $xoff < $infile | \
+ 		selectpnts -b 4 -f $firsttokeep -g $lenkeep -s $lenfft     > $outfile } msg ]
 		puts $msg
 		flush stdout
 	}
 #
-puts $hdrfile [exec printbyteorder "    fft byteorder          :"]
 puts $hdrfile "    samples/rbin input     : $numtimpnts"
 puts $hdrfile "    samples/rbin used      : $numtimpntsout"
 puts $hdrfile "    length fft             : $lenfft " 
@@ -158,7 +151,3 @@ puts $hdrfile "drv_fft_pwr.sc END         : [exec date]"
 	incr fnum
 
 }
-#
-#   Make an initial stab at the scaling.
-#
-exec drv_scale.sc $nfirst $numloop

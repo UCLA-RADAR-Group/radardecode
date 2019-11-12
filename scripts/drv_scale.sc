@@ -4,9 +4,6 @@
 #	..   
 #	operate on map file, remove avg and scale to sigma
 #
-# <mcn001> Correct spelling of firstrow in arg list  2002 June 19
-# 2012feb09  print byteorder
-# 2012feb17  set default cols to 1..n/5
 #	
 #	firstfile... $infilexx 
 #       numfiles ... to read in
@@ -21,27 +18,18 @@ set numfreq=`ex.awk $DRVSB spcfftkeep`
 #
 set firstrow=1
 set lastrow=$numbins
-set firstcol=1
-@ lastcol = $numfreq / 5
-if ($lastcol == 0) set lastcol=1
 set parms=($*)              
 if ( $#parms == 6 ) then
-# <mcn001>
-	set firstrow=$5 
+	set fistrow=$5 
 	set lastrow=$6 
-	set firstcol=$3
-	set lastcol=$4
-else if ($#parms == 4) then
-# 20120217 MCN/PT
-    set firstcol=$3
-    set lastcol=$4
-else if ( $#parms != 2 ) then
+else if ( $#parms != 4 ) then
 echo "Usage: drv_scale.sc firstfile numfile firstcolumn lastcolumn {firstRow lastRow}"
 exit(0)
 endif
-
 set fnum=$1
 set numloop=$2
+set firstcol=$3
+set lastcol=$4
  
 set tmpfile=tmp$$
 #
@@ -63,7 +51,6 @@ scaletosigma -r $numbins -c $numfreq -f $firstcol -l $lastcol -F $firstrow \
 #
 set avg=`ex.awk $tmpfile avg`
 set sig=`ex.awk $tmpfile sig`
-printbyteorder "    scaling byteorder      :" >> $hdr
 echo "    average removed        : ${avg}"  >> $hdr
 echo "    1 sigma scaling        : ${sig}" >> $hdr
 echo "    1st/last frqbin        : ${firstcol} ${lastcol}" >> $hdr
@@ -74,4 +61,4 @@ echo "Done with ${infile}"
 @ fnum=$fnum + 1
 @ numloop=$numloop - 1
 end
-/bin/rm -f $tmpfile
+rm -f $tmpfile
