@@ -18,19 +18,36 @@ set numfreq=`ex.awk $DRVSB spcfftkeep`
 #
 set firstrow=1
 set lastrow=$numbins
-set parms=($*)              
+
+
+set firstcol=1
+@ lastcol = $numfreq / 5
+if ($lastcol == 0) set lastcol=1
+set parms=($*)
 if ( $#parms == 6 ) then
-	set fistrow=$5 
-	set lastrow=$6 
-else if ( $#parms != 4 ) then
+# <mcn001>
+        set firstrow=$5
+        set lastrow=$6
+        set firstcol=$3
+        set lastcol=$4
+else if ($#parms == 4) then
+# 20120217 MCN/PT
+    set firstcol=$3
+    set lastcol=$4
+else if ( $#parms != 2 ) then
 echo "Usage: drv_scale.sc firstfile numfile firstcolumn lastcolumn {firstRow lastRow}"
 exit(0)
 endif
+
 set fnum=$1
 set numloop=$2
-set firstcol=$3
-set lastcol=$4
- 
+
+
+
+
+
+
+
 set tmpfile=tmp$$
 #
 while ( $numloop > 0 )
@@ -61,4 +78,4 @@ echo "Done with ${infile}"
 @ fnum=$fnum + 1
 @ numloop=$numloop - 1
 end
-rm -f $tmpfile
+/bin/rm -f $tmpfile
