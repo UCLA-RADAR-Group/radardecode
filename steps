@@ -1,0 +1,19 @@
+need to have a ~/bin folder in linux
+
+need to have make, csh, gcc
+
+need to install fftw.h(version 2.1.5) library for c
+	download the package
+	tar -xvzf fftw....
+	./configure --enable-float --prefix=${HOME}
+	make
+	make install
+make : works without errors in radardecode [warnings for functions]
+
+
+for p2pfs data :
+export DRVSB=drv.p2pfs
+drv_all.sc first all
+drv_Scale.sc 1 1
+drv_mapmsc.sc 1 1 1 1
+
