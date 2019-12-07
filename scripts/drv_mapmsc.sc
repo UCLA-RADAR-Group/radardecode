@@ -84,6 +84,12 @@ endif
 @ numRows= (($numfiles / $filesToAvg ) + $mapsPerRow - 1 ) / $mapsPerRow
 set  bname=`basename $basefile`
 set  dname=`dirname $basefile`
+
+if ( ! -e Fits ) then
+        mkdir Fits
+endif
+
+
 #
 if ( $numfiles == 1 ) then
 	set  fitsName=$dname/Fits/f${file1}.fit
