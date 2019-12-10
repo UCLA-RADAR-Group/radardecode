@@ -16,6 +16,7 @@
 #   colOffset column offset for maps
 # ----------------
 #set verbose
+#todospd unset noclobber ?
 set basefile=`ex.awk $DRVSB fbase`
 set    sufin=`ex.awk $DRVSB sufscl`
 set  rngbins=`ex.awk $DRVSB numbins`
@@ -33,7 +34,7 @@ set usage="Usage drv_mapmsc.sc {-s col1 col2 -S row1 row2} file1 numFiles toAvg 
 #
 #	should we rescale the the maps files ??
 #
-touch $hdr
+touch $hdr #todospd remove this?
 echo "drv_mapmsc.sc START       :`date`" >>  $hdr
 set doneopt=0
 while ( $doneopt == 0 ) 
@@ -89,13 +90,14 @@ if ( ! -e Fits ) then
         mkdir Fits
 endif
 
-
 #
-if ( $numfiles == 1 ) then
-	set  fitsName=$dname/Fits/f${file1}.fit
-else
+# setting name of fits file
+#
+#if ( $numfiles == 1 ) then
+#	set  fitsName=$dname/Fits/f${file1}.fit
+#else
 	set  fitsName=$dname/Fits/f${numRows}x${mapsPerRow}.fit
-endif
+#endif
 #
 #  if we make the maps files, to it here
 #
@@ -103,21 +105,21 @@ if ( $makemaps != 0 ) then
 	drv_scale.sc $file1 $numfiles $col1scale $col2scale $row1scale $row2scale
 endif
 #
+# if we avg maps.. store averages in $tempavg$$.n (no if)
+#
+#if ( $filesToAvg > 1 ) then
+	set fileNumOut=900
+	drv_mapavg.sc $file1 $numfiles $filesToAvg $fileNumOut maps
+#else 
+#	set fileNumOut=$file1
+#endif
+@ mapsInMos= $numfiles / $filesToAvg 
+#
 # if we rotate the maps files, do it 
 #
 if ( $torotate != 0 ) then
-	drv_rotrange.sc $file1 $numfiles $torotate
+	drv_rotrange.sc 900 $mapsInMos $torotate
 endif
-#
-# if we avg maps.. store averages in $tempavg$$.n
-#
-if ( $filesToAvg > 1 ) then
-	set fileNumOut=900
-	drv_mapavg.sc $file1 $numfiles $filesToAvg $fileNumOut maps
-else 
-	set fileNumOut=$file1
-endif
-@ mapsInMos= $numfiles / $filesToAvg 
 #
 # now merge map create fits file
 #
