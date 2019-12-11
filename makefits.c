@@ -1,20 +1,16 @@
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
+#include	"utilLib.h"
 #define STDOUT 1
 #define TRUE 1
 #define FALSE 0
-#define ERROR -1
+// #define ERROR -1
 #define  min(a,b) ( (a) < (b) ? (a) : (b) )
 #define  max(a,b) ( (a) > (b) ? (a) : (b) )
 
 void    processargs(int argc,char **argv,int *prows,int *pcols,int *pflip);
-
-/* revision control variable */
-static char const rcsid[] = 
-"$Id$";
-
-main(int argc,char **argv)
+int main(int argc,char **argv)
 {
 /*
  *	makefits -r rows -c cols -f <  >
@@ -35,17 +31,16 @@ main(int argc,char **argv)
 	float   maxval,minval;
 	int	bytesinp,bytesinpreq,wordsinp;
 	int     wordsinptot;
-	int	bytesout;
 	int	i,j;
 	float	*prow,*pcol;
 	int	irow,rowsinp;
 	double  bscale,bzero,dscale;
 	double  dmaxval,dminval;
-	double dtemp1,dtemp2;
-	char     hdr[2880],*phdr,*ptmp;
-	int	outbuf[720];
 
 	flip=FALSE;
+	flipbuf=NULL;
+	minval=1e15;
+	maxval=-minval;
         processargs(argc,argv,&numRows,&numCols,&flip);
 	if ((inbuf=(float *)malloc(sizeof(float)*numRows*numCols)) ==
 		(float *)NULL){
@@ -122,7 +117,7 @@ done:   dmaxval=maxval;
  *	now loop scaling and outputing  the data
 */
 	if (fitsOutData(FALSE,(FILE *)NULL,STDOUT,"f","i",wordsinptot,
-	    bscale,bzero,bptr) == ERROR)
+	    bscale,bzero,(char*)bptr) == ERROR)
 		 exit(ERROR);
 	exit(0);
 }
@@ -145,7 +140,6 @@ void    processargs(int argc,char **argv,int *rows,int *cols,int *flip)
 */
         int getopt();                   /* c lib function returns next opt*/
         extern char *optarg;            /* if arg with option, this pts to it*/
-        extern int optind;              /* after call, ind into argv for next*/
         extern int opterr;              /* if 0, getopt won't output err mesg*/
  
         int c;                          /* Option letter returned by getopt*/
@@ -181,7 +175,6 @@ void    processargs(int argc,char **argv,int *rows,int *cols,int *flip)
 /*
         here if illegal option or argument
 */
-errout: fprintf(stderr,"%s\n",rcsid);
-        fprintf(stderr,"%s\n",USAGE);
+errout: fprintf(stderr,"%s\n",USAGE);
         exit(1);
 }
