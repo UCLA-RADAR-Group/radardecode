@@ -14,7 +14,7 @@ make : works without errors in radardecode [warnings for functions]
 for p2pfs data :
 export DRVSB=drv.p2pfs
 drv_all.sc first all
-drv_scale.sc 1 1
-drv_mapavg.sc 1 1 1 900 maps
+#drv_scale.sc 1 1
+#drv_mapavg.sc 1 1 1 900 maps
 drv_mapmsc.sc 1 1 1 1 
 
