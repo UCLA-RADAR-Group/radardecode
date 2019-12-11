@@ -1,17 +1,23 @@
 #include	<stdio.h>
 #include	<unistd.h>
-#define OK 0
-#define ERROR -1  
+#include	<utilLib.h>
+#include	<netinet/in.h>
 /*
  *	output fits data 
  *	if ok, return 0
  *	if error return -1
 */
+/*
+ * MCN 20080103 added htonl in SCALEIT macro.
+ * pjp 20080614 htonl only works for longs.. need to split SCALEIT
+ *              int SCALEITi SCALITs to work for ints and shorts.. 
+ */
 
 /* 
  *	macro to scale the data
 */
-#define SCALEIT(before,after) after=((before - bzero) * dscale)
+#define SCALEITi(before,after) after=htonl((int)((before - bzero) * dscale))
+#define SCALEITs(before,after) after=htons((short)((before - bzero) * dscale))
 /*
  *	macro to output a full record
 */
@@ -34,9 +40,18 @@
 /*
  *	macro to due all process for 1 set of data types
 */
-#define PROCESS(pbuf,pobuf)  \
+#define PROCESSs(pbuf,pobuf)  \
             for (j=0,i=0;i<numwords;i++){\
-	       SCALEIT(pbuf[i],pobuf[j++]);\
+	       SCALEITs(pbuf[i],pobuf[j++]);\
+               if ( j >= wordsPerRec) {   /* filled a rec??*/\
+	          OUTPUTIT(j);\
+	       }\
+             }\
+	     LASTREC(j,pobuf);
+
+#define PROCESSi(pbuf,pobuf)  \
+            for (j=0,i=0;i<numwords;i++){\
+	       SCALEITi(pbuf[i],pobuf[j++]);\
                if ( j >= wordsPerRec) {   /* filled a rec??*/\
 	          OUTPUTIT(j);\
 	       }\
@@ -87,11 +102,11 @@ int	fitsOutData(
 	    pbufS=(short *)buf;
 	    if (outInt) {
 	       poutI=(int *)outbuf;
-               PROCESS(pbufS,poutI);
+               PROCESSi(pbufS,poutI);
 	    }
 	    else {
 	       poutS=(short *)outbuf;
-               PROCESS(pbufS,poutS);
+               PROCESSs(pbufS,poutS);
 	    }
 	    break;
 /*
@@ -102,11 +117,11 @@ int	fitsOutData(
 	    pbufI=(int *)buf;
 	    if (outInt) {
 	       poutI=(int *)outbuf;
-               PROCESS(pbufI,poutI);
+               PROCESSi(pbufI,poutI);
 	    }
 	    else {
 	       poutS=(short *)outbuf;
-               PROCESS(pbufI,poutS);
+               PROCESSs(pbufI,poutS);
 	    }
 	    break;
 /*
@@ -117,11 +132,11 @@ int	fitsOutData(
 	    pbufF=(float *)buf;
 	    if (outInt) {
 	       poutI=(int *)outbuf;
-               PROCESS(pbufF,poutI);
+               PROCESSi(pbufF,poutI);
 	    }
 	    else {
 	       poutS=(short *)outbuf;
-               PROCESS(pbufF,poutS);
+               PROCESSs(pbufF,poutS);
 	    }
 	    break;
 /*
@@ -132,11 +147,11 @@ int	fitsOutData(
 	    pbufD=(double *)buf;
 	    if (outInt) {
 	       poutI=(int *)outbuf;
-               PROCESS(pbufD,poutI);
+               PROCESSi(pbufD,poutI);
 	    }
 	    else {
 	       poutS=(short *)outbuf;
-               PROCESS(pbufD,poutS);
+               PROCESSs(pbufD,poutS);
 	    }
 	    break;
           default:
