@@ -61,6 +61,8 @@ if { ( $argc  - $argi) != 2  } {
 }
 set fnum     [lindex $argv $argi]
 set numloop  [lindex $argv [expr $argi + 1 ]]
+set nfirst $fnum
+
 set torotate [expr $lenkeep / 2 ]
 set firsttokeep [expr ($lenfft - $lenkeep) / 2 + 1]
 
@@ -151,3 +153,8 @@ puts $hdrfile "drv_fft_pwr.sc END         : [exec date]"
 	incr fnum
 
 }
+#
+#   Make an initial stab at the scaling.
+#
+exec drv_scale.sc $nfirst $numloop
+
