@@ -16,8 +16,5 @@ export DRVSB=drv.p2pfs
 drv_all.sc first all
 drv_scale.sc 1 1
 drv_mapavg.sc 1 1 1 900 maps
-
-drv_mapmsc.sc 1 1 1 1 [makefits does not work yet]
-makefits -f -c 400 -r 1000 < 2010NY65.mapsf1 > test.fits
-just the makefits (executable from rserv and asteria works)
+drv_mapmsc.sc 1 1 1 1 
 
