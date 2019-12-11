@@ -9,9 +9,13 @@
 #
 #	suffixes:   
 #set verbose
-set remfile="-d"
+set remfile=""
 if ( "$1" == "-n") then
 set remfile=""
+shift
+endif
+if ( "$1" == "-d") then
+set remfile="-d"
 shift
 endif
 #
