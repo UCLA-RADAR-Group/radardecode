@@ -10,7 +10,10 @@ The goals of this repository are to facilitate the maintenance and improve the p
 
 # Test 
  In Ubuntu 18.10
-	need "make", "csh", "gcc", fftw library version 2.1.5 : ./configure --enable-float --prefix=${HOME},a ~/bin ~/lib folder
+	need "make", "csh", "gcc",
+	a ~/bin ~/lib folder
+	fftw library version 2.1.5 : ./configure --enable-float --prefix=${HOME}, 
+	fftw library version 3 : ./configure --enable-float --prefix=${HOME},
 
 # Task list
 
