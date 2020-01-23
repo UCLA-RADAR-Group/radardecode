@@ -3,6 +3,7 @@
 #include        <fcntl.h>
 #include        <malloc.h>
 #include		<unistd.h>
+#include		<fftw3.h>
 #define STDOUT 1
 #define TRUE 1
 #define FALSE 0
@@ -12,16 +13,6 @@
 void    processargs(int argc,char **argv,int *pnumpoints,char *xformdirection,
                 int *pzerofill,int *pcpntsperfft,int *premoveDc,int *pnumskip);
 extern int  read_pipe();
-#if FALSE
-extern void four1_();
-#endif
-
-extern void fftwAo(float *inDat,           /* to xform*/
-            float *outDat,          /* NULL if inplace*/
-            int lenxform,
-            int direction,      /* sign of exponent*/
-            int inplace ) ;       /* 1 inplace, 0 no inplace*/
-
 
 char    xformdirection[2]="f";          /* f forward, r reverse*/
 int main(int argc,char **argv)
@@ -70,6 +61,7 @@ int main(int argc,char **argv)
         int     removeDc;                       /* removeDc*/
         float   vI,vQ;                          /* i,q value for dc removal*/
         float   *pf;
+		fftwf_plan fftwPlan;
 
 /*
  *      setup the defaults
@@ -98,6 +90,12 @@ int main(int argc,char **argv)
             perror("fft: Allocating input buffer");
             exit(-1);
         }
+/*
+ * fftw plan ..fftw_measure was taking a long time for some fftlengths
+*/
+		fftwPlan=fftwf_plan_dft_1d(numpoints,(fftwf_complex*)inp_buf,
+				(fftwf_complex*)inp_buf,xformdir,FFTW_ESTIMATE);
+//				(fftwf_complex*)inp_buf,xformdir,FFTW_MEASURE);
 /*
  * 		optionally skip data at the beginning <pjp001> below
 */
@@ -135,7 +133,7 @@ int main(int argc,char **argv)
                  *pf++ -=vQ;
                }
             }
-            fftwAo(inp_buf,NULL,numpoints,xformdir,1);
+			fftwf_execute_dft(fftwPlan,(fftwf_complex*)inp_buf,(fftwf_complex*)inp_buf);
 #if FALSE
             four1_(inp_buf,&numpoints,&xformdir);
 #endif
@@ -171,11 +169,9 @@ void    processargs
         function to process a programs input command line.
         This is a template that can be customized for individual programs
         To use it you should:
-
         - pass in the parameters that may be changed.
         - edit the case statement below to correspond to what you want.
         - stdio.h must be added for this routine to work
-
         Don't forget the ** on the arguments coming in (since you want to 
         pass back data.
 */
