@@ -169,7 +169,7 @@ while ( $fifoToUse <= $numpol )
     #$stem/convdatatype -q -i i4 -o f4 |\
     i4tor4|zerofill $nofillflag -b 8 -i $fftlen -o $fftlen |\
     fftfilter -d f -n $fftlen -s $numskip |\
-    power |\
+    power_ao |\
     avgdata -d r4 -g $fftlen -h $nfftave $ignore |\
     rotate -i $fftlen -r $torotate >> $outfile
     echo "Done with scan ${scannum}"
