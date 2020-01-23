@@ -1,3 +1,4 @@
+#include		<stdlib.h>
 #include        <stdio.h>
 #include		<unistd.h>
 #include		<string.h>
@@ -9,7 +10,7 @@
  *
  *    call 
  *
- *    avgdata  -d ii -l locavg -g glblen -h glbavg 
+ *    avgdata  -d ii -l locavg -g glblen -h glbavg -i 
  *
  *  program acts as a filter.  reads from standard in, writes to standard out
  *
@@ -36,6 +37,8 @@
  *   -g    length of ipp 
  *   -h    number of ipps to avg (def 1).:q
  *         -1 --> avg all ipps till eof is hit.
+ *   -i    ignore first ipp of each average.  (must set -h > 1 obviously)
+
  *        
  *      all averaging is done using real*4 variables. 
  *  
@@ -45,6 +48,8 @@
  *      10/11/91..add -1 as a valid number of global ipps to avg. (-h).   
  *                if -1 is specified, then avg ipps till eof is hit. 
  *                Any partial ipps at the end will be ignored.
+ *      15may061..addded -i option. ignore first record of each average
+ *                (for radar processing. -h should be > 1 for this to work)
  *
 */
 #define STDINP     0
@@ -61,14 +66,10 @@ int     outbufbytes;
 void   avgi1(int locavg,int ippavg,int typebytes);
 void   avgi2(int locavg,int ippavg,int typebytes);
 void   avgi4(int locavg,int ippavg,int typebytes);
-void   avgr4(int locavg,int ippavg,int typebytes);
+void   avgr4(int locavg,int ippavg,int typebytes,int ignorefirst);
 void   avgr8(int locavg,int ippavg,int typebytes);
 void    processargs(int argc,char **argv,char *datatype,int *locavg,
-                                        int     *glblen,int     *glbavg);
-
-/* revision control variable */
-static char const rcsid[] = 
-"$Id$";
+                    int     *glblen,int     *glbavg,int *ignorefirst);
 
 int main(int argc,char **argv)
 {
@@ -77,8 +78,10 @@ int main(int argc,char **argv)
         int     ipplen;                 /* length of ipp*/
         int     ippavg;                 /* ipps to avg*/
         int     typebytes;              /* bytes for our type*/
+		int		ignorefirst;		    /* ignore 1st ipp in an average*/
 
-        processargs(argc,argv,datatype,&locavg,&ipplen,&ippavg);
+		ignorefirst=FALSE;
+        processargs(argc,argv,datatype,&locavg,&ipplen,&ippavg,&ignorefirst);
 /*
  *      compute our constants here. 
  *     
@@ -99,7 +102,7 @@ int main(int argc,char **argv)
            avgi4(locavg,ippavg,typebytes);
         }
         else if (!strcmp(datatype,"r4")) {
-           avgr4(locavg,ippavg,typebytes);
+           avgr4(locavg,ippavg,typebytes,ignorefirst);
         }
         else if (!strcmp(datatype,"r8")) {
            avgr8(locavg,ippavg,typebytes);
@@ -490,7 +493,8 @@ void   avgr4
 (
 int     locavg,                         /* avg within an ipp*/
 int     ippavg,                         /* ipps to avg*/
-int     typebytes)                      /* this datatype*/              
+int     typebytes,                      /* this datatype*/              
+int     ignorefirst)                    /* ignore first ipp*/
 {
         typedef  float loctype;
         loctype  *in_buf,*out_buf;
@@ -511,7 +515,7 @@ int     typebytes)                      /* this datatype*/
         ijunk=0;
         totbytesread=0;
         ippavgloc=(ippavg == -1)? 1000000000:ippavg;/*-1--> go till eof*/
-        avginv = 1./(locavg*ippavg);
+        avginv = (ignorefirst)? 1./(locavg*(ippavg-1)):1./(locavg*ippavg);
         in_buf=(loctype *)calloc((unsigned)inpbufwords,sizeof(loctype));
         if (in_buf == NULL){
            perror("avgdata: allocate in_buf");
@@ -578,18 +582,21 @@ int     typebytes)                      /* this datatype*/
 /*
  *      move or add it to average buffer
 */
-                if (ipp == 0){
-                    ijunk=1;
-                    for (i=0;i<inpbufwords;i++){
+				if (ignorefirst && (ipp == 0)){  /* skip first ipp*/
+				} else {
+				  if ((ipp == 0) || ((ipp == 1) && (ignorefirst))) {
+                     ijunk=1;
+                     for (i=0;i<inpbufwords;i++){
                         avg_buf[i] =  in_buf[i];
                     }
-                }
-                else { 
+                  }
+                  else { 
                     if (inpbufwords > 0) ijunk++;
                     for (i=0;i<inpbufwords;i++){
                         avg_buf[i] = in_buf[i] + avg_buf[i];
                     }
-                }
+                  }
+			   }
             }
 /*
  *      now average within an ipp
@@ -756,7 +763,8 @@ char    **argv,
 char    *datatype,
 int     *locavg,
 int             *glblen,
-int             *glbavg)
+int             *glbavg,
+int		*ignorefirst)
 {
 /*
         function to process a programs input command line.
@@ -775,9 +783,9 @@ int             *glbavg)
         extern int opterr;              /* if 0, getopt won't output err mesg*/
 
         int c;                          /* Option letter returned by getopt*/
-        char  *myoptions = "d:g:l:h:";  /* options to search for. :--> needs
+        char  *myoptions = "d:g:l:h:i";  /* options to search for. :--> needs
                                             an argument*/
-char *USAGE = "Usage: avgdata -d datatype -l locavg -g globlen -h globavg";
+char *USAGE = "Usage: avgdata -d datatype -l locavg -g globlen -h globavg -i";
 
         opterr = 0;                             /* turn off there message*/
         strcpy(datatype,"i1");                  /* default data type*/
@@ -801,6 +809,10 @@ char *USAGE = "Usage: avgdata -d datatype -l locavg -g globlen -h globavg";
           case 'l':
                    sscanf(optarg,"%d",locavg);          /* get local avg*/
                    break;
+		  case 'i':
+                   *ignorefirst = TRUE;     /* ignore first ipp in an average */
+                   break;
+
           case '?':                     /*if c not in myoptions, getopt rets ?*/
              goto errout;
              break;
@@ -838,7 +850,7 @@ char *USAGE = "Usage: avgdata -d datatype -l locavg -g globlen -h globavg";
             *glblen = (1024 / *locavg) * (*locavg);
             *glbavg = 1;
         }
-        /*to_lowercase(datatype); */
+        to_lowercase(datatype);
         if ( strcmp(datatype,"i1") && strcmp(datatype,"i2") &&
              strcmp(datatype,"i4") && strcmp(datatype,"r4") &&
              strcmp(datatype,"r8")) {
@@ -850,12 +862,17 @@ char *USAGE = "Usage: avgdata -d datatype -l locavg -g globlen -h globavg";
                      *locavg,*glblen);
              goto errout; 
         }
+		if (*ignorefirst && *glbavg == 1) {
+     		fprintf(stderr,"Can't drop first ipp if global avg = %d\n",
+        			 *glbavg);
+  		    goto errout;
+		}
+
         return;
 /*
  *      here if error occured
 */
 errout: ;
-        fprintf(stderr,"%s\n",rcsid);
         fprintf(stderr,"%s\n",USAGE);
         exit(1);
         /*NOTREACHED*/
