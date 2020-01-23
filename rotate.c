@@ -3,7 +3,8 @@
 #include        <malloc.h>
 #include <unistd.h>
 #include <philLib.h> 
- 
+#include        <stdlib.h>
+
 
 #define STDOUT 1
 #define  min(a,b)   ( (a) < (b) ? (a) : (b) )
