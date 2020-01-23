@@ -24,6 +24,8 @@ libunpack:     unp_pfs_pc_edt.c; $(CC) $(CFLAGS) -c unp_pfs_pc_edt.c -o libunpac
 radardecode: radardecode.c fftwAo.o unpriV_f4.o read_pipe.o timerstart.o timervalue.o
 	$(CC) $(CFLAGS) radardecode.c fftwAo.o unpriV_f4.o read_pipe.o timerstart.o timervalue.o -L$(LPATH) libunpack.o -lfftw -lm -o $(GLOBDIR)/radardecode
 #
+rotate: rotate.c read_pipe.o
+	$(CC) $(CFLAGS) rotate.c read_pipe.o -lm -o $(GLOBDIR)/rotate
 
 rotate: rotate.c read_pipe.o
 	$(CC) $(CFLAGS) rotate.c read_pipe.o -lm -o $(GLOBDIR)/rotate
@@ -38,7 +40,7 @@ selectpnts: selectpnts.c writen.o read_pipe.o
 	$(CC) $(CFLAGS) selectpnts.c writen.o read_pipe.o -lm -o $(GLOBDIR)/selectpnts
 
 comppncode: comppncode.c
-	$(CC) $(CFLAGS) comppncode.c -lm -o $(GLOBDIR)/comppncode
+	$(CC) $(CFLAGS) comppncode.c -lm -o $(GLOBDIR)/comppncode	
 
 compdsncode: compdsncode.c
 	$(CC) $(CFLAGS) compdsncode.c -lm -o $(GLOBDIR)/compdsncode
@@ -55,8 +57,9 @@ makefits: makefits.c read_pipe.o fitsCmpScl.o fitsOutData.o fitsOutHdr.o
 mapsmerge: mapsmerge.c
 	$(CC) $(CFLAGS) mapsmerge.c -lm -o $(GLOBDIR)/mapsmerge
 
-avgdata: avgdata.c read_pipe.o
-	$(CC) $(CFLAGS) avgdata.c read_pipe.o -lm -o $(GLOBDIR)/avgdata
+
+avgdata: avgdata.c read_pipe.o to_lowercase.o
+	$(CC) $(CFLAGS) avgdata.c read_pipe.o to_lowercase.o -lm -o $(GLOBDIR)/avgdata
 
 stripVme: stripVme.c read_pipe.o hdrLib.h
 	$(CC) $(CFLAGS) stripVme.c read_pipe.o -o $(GLOBDIR)/stripVme
@@ -70,8 +73,8 @@ i4tor4: i4tor4.c
 zerofill: zerofill.c read_pipe.o
 	$(CC) $(CFLAGS) zerofill.c read_pipe.o -lm -o $(GLOBDIR)/zerofill
 
-fftfilter: fftfilter.c fftwAo.o read_pipe.o 
-	$(CC) $(CFLAGS) fftfilter.c fftwAo.o read_pipe.o -L$(LPATH) -lfftw -lm -o $(GLOBDIR)/fftfilter
+fftfilter: fftfilter.c read_pipe.o
+	$(CC) $(CFLAGS) fftfilter.c read_pipe.o -L$(LPATH) -lfftw3f -lm -o $(GLOBDIR)/fftfilter
 
 power: power.c read_pipe.o 
 	$(CC) $(CFLAGS) power.c read_pipe.o -lm -o $(GLOBDIR)/power
@@ -86,3 +89,5 @@ fitsOutData.o:	 fitsOutData.c ;$(CC) $(CFLAGS) -c fitsOutData.c
 fitsOutHdr.o:	 fitsOutHdr.c ; $(CC) $(CFLAGS) -c fitsOutHdr.c
 timerstart.o:	 timerstart.c ; $(CC) $(CFLAGS) -c timerstart.c
 timervalue.o:	 timervalue.c ; $(CC) $(CFLAGS) -c timervalue.c
+timervalue.o:	 timervalue.c ; $(CC) $(CFLAGS) -c timervalue.c
+to_lowercase.o:	 to_lowercase.c ; $(CC) $(CFLAGS) -c to_lowercase.c
