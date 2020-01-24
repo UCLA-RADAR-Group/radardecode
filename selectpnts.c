@@ -1,10 +1,10 @@
 #include        <stdio.h>
+#include		<stdlib.h>
 #include        <fcntl.h>
 #include        <malloc.h>
 #include <unistd.h>
-#include <tarLib.h>
 #include <philLib.h> 
-#include	<errno.h>
+#include <errno.h>
  
 
 #define STDOUT 1
@@ -15,10 +15,7 @@
 
 void    processargs(int argc,char **argv,int *bytes_per_pnt,int *first_pnt,
 				int *pnts_in_grp,int *pnts_in_ipp);
-
-/* revision control variable */
-static char const rcsid[] = 
-"$Id$";
+int writen(int fd,char *bufadr,int numbytes);
 
 int main(int argc,char **argv)
 {
@@ -236,7 +233,31 @@ int     *pnts_in_ipp)
 /*
         here if illegal option or argument
 */
-errout: fprintf(stderr,"%s\n",rcsid);
-        fprintf(stderr,"%s\n",USAGE);
+errout: fprintf(stderr,"%s\n",USAGE);
         exit(1);
 }
+/******************************************************************************/
+/*      write to a pipe or socket n bytes                     */
+/******************************************************************************/
+int writen(int fd,char *bufadr,int numbytes)
+{
+/*
+ *  write numbytes to fd or socket
+ *  write until the requested byte count is completed.
+ *  if eof on a write, return 0
+ *  if error on a write return neg num
+*/
+    int byteswritten;           /* written*/
+    int bytesleft;              /* left to write*/
+
+             bytesleft = numbytes;
+         while (bytesleft > 0) {
+        byteswritten=write(fd,bufadr,(unsigned int)bytesleft);
+            if (byteswritten<=0)
+                    return(byteswritten);
+        bufadr+=byteswritten;
+        bytesleft-=byteswritten;
+         }
+         return(numbytes-bytesleft);
+}
+

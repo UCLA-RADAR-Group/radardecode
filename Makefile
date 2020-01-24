@@ -36,8 +36,8 @@ radarfft: radarfft.c fftwAo.o read_pipe.o
 radarcplxfft: radarcplxfft.c 
 	$(CC) $(CFLAGS) radarcplxfft.c fftwAo.o read_pipe.o -L$(LPATH) -lfftw -lm -o $(GLOBDIR)/radarcplxfft
 
-selectpnts: selectpnts.c writen.o read_pipe.o
-	$(CC) $(CFLAGS) selectpnts.c writen.o read_pipe.o -lm -o $(GLOBDIR)/selectpnts
+selectpnts: selectpnts.c read_pipe.o
+	$(CC) $(CFLAGS) selectpnts.c read_pipe.o -lm -o $(GLOBDIR)/selectpnts
 
 comppncode: comppncode.c
 	$(CC) $(CFLAGS) comppncode.c -lm -o $(GLOBDIR)/comppncode	
