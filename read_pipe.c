@@ -1,5 +1,6 @@
 #include	<stdio.h>
 #include	<unistd.h>
+#include	<utilLib.h> 
 #define	STDINP     0
 /******************************************************************************/
 /*      read from a pipe              			 		      */
