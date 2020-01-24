@@ -1,19 +1,13 @@
+#include	    <phlibExtras.h>
 #include        <stdio.h>
 #include        <stdlib.h>
 #include        <string.h>
 #include        <memory.h>
 #include        <hdrLib.h>
-#ifdef LINUX
-#include		<byteswap.h>
-#define	         linux  1
-#else
-#define          linux 0 
-int				bswap_32(int );
-#endif
 #include        <unistd.h>
-#include		<tarLib.h>
-#include        <philLib.h>
- 
+#include        <byteswap.h>
+#include	    <philLib.h>
+
 #define         MAXBUFSIZE   1024*1024
 #define  STDOUT 1
 #define  FALSE 0
@@ -79,6 +73,7 @@ int main(int argc,char **argv)
  *    11oct02 .. added -b option. update maxbufsize 128K -> 1mb
  *    14jul03 .. added code to run on linux
  *              need -DLINUX  in the compile line
+ *    15jan08 .. this version just runs on linux.
  *history end  
 */
         char          hdrbuf[MAXBUFSIZE];               /* input buffer*/
@@ -138,8 +133,8 @@ int main(int argc,char **argv)
 */
 			while (1) {
 		    	markerOk=(strncmp((char *)hdrbuf,(char *)HDR_MARKER,4)==0);
-				reclen=(linux)?bswap_32(phdrg->reclen):phdrg->reclen;
-				hdrlen=(linux)?bswap_32(phdrg->hdrlen):phdrg->hdrlen;
+				reclen=bswap_32(phdrg->reclen);
+				hdrlen=bswap_32(phdrg->hdrlen);
 		    	recLenOk=(reclen >= 128)  && (reclen < 5e6);
 		    	hdrLenOk=(hdrlen >= 128)  && (hdrlen < 4000);
 				if ((!markerOk) || (!recLenOk) || (!hdrLenOk)) {/*hdr_ ?*/
@@ -167,7 +162,7 @@ int main(int argc,char **argv)
 /*
  *      Total record length and extended header length.
 */
-		    reclen=(linux)?bswap_32(hdrg.reclen):hdrg.reclen;
+		    reclen=bswap_32(hdrg.reclen);
             dataToReadB=reclen - hlenGenB; /* data left to read*/
             cptr=&(hdrbuf[hlenGenB]); /* where to put rest of data*/
 /*
@@ -183,7 +178,7 @@ int main(int argc,char **argv)
 		/*
 		 * see if we output this record
 		*/
-		itemp=(linux)?bswap_32(hdrg.scanNumber):hdrg.scanNumber;
+		itemp=bswap_32(hdrg.scanNumber);
 		if (scan!= itemp){
 			scanCount++;
 		}
@@ -204,10 +199,10 @@ int main(int argc,char **argv)
 /*
  *      now output the data or header
 */
-		 itemp=(linux)?bswap_32(hdrg.grpNum):hdrg.grpNum;
+		 itemp=bswap_32(hdrg.grpNum);
 		 if  ((itemp < strI.firstGrp) || (itemp > strI.lastGrp)) continue;
          if (!strI.stripHdr) {
-             bytesreq=(linux)?bswap_32(hdrg.hdrlen):hdrg.hdrlen;
+             bytesreq=bswap_32(hdrg.hdrlen);
              if (( byteswritten = write(STDOUT,(char *)hdrbuf,bytesreq)) !=
                    bytesreq){
                 fprintf(stderr,
@@ -217,13 +212,8 @@ int main(int argc,char **argv)
              }
          }
          if (!strI.stripData) {
-			 if (linux) {
              	bytesreq= bswap_32(hdrg.reclen) - bswap_32(hdrg.hdrlen);
                 cptr= hdrbuf + bswap_32(hdrg.hdrlen);
-			} else {
-             	bytesreq= hdrg.reclen - hdrg.hdrlen;
-                cptr= hdrbuf + hdrg.hdrlen;
-			}
              if (( byteswritten = write(STDOUT,cptr,bytesreq)) !=
                    bytesreq){
                 fprintf(stderr,
