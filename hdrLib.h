@@ -63,11 +63,7 @@ If a section is not used, it will contain zeros.
 */
 #ifndef INChdrLibh
 #define INChdrLibh
-#ifdef	VXWORKS
-#include	<vxWorks.h>
-#else
-#include	<vxWorksEm.h>
-#endif
+#include	"phlibExtras.h"
 #include	<string.h>
 #include	<stdio.h>
 

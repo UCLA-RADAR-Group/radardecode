@@ -1,16 +1,9 @@
 /*
  *	include file for riunpack routines
  *
- * history:
- * 15mar93 - created
 */
 #ifndef INCUnprih
 #define INCUnprih
-#ifdef VXWORKS
-#include	<vxWorks.h>
-#else
-#include	<vxWorksEm.h>
-#endif
 
 #define   unpri_1(val,outptr,inc)  \
           *(outptr)=lkup_1[(val)&1];\
@@ -109,7 +102,5 @@
 #define   unpri_12(val,outptr,inc)  \
           *outptr = val;\
           (outptr)+=(inc);
-
-
 
 #endif	/*INCunprih*/  

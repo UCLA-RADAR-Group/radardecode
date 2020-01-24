@@ -19,6 +19,10 @@ modification history
    ,06dec95,pjp  added tdCom errors
    ,22feb96,pjp  added micro control com errors.
    ,30aug96,pjp  added corLProc errors.
+   ,26sep02,pjp  added hp437 errors
+   ,29oct02,pjp  added agcProg generic cmd errors
+   ,19oct07,pjp  added kronhiteE filter errors
+   ,26sep14,pjp  added prologix gpib enet errors
 */
 
 #ifndef INCaoErrNumh
@@ -123,6 +127,13 @@ modification history
 #define aoM_ter     ( 0x43f << 16 )  /* tertiary errors.*/
 #define aoM_gio     ( 0x440 << 16 )  /* general i/o program*/
 #define aoM_gior    ( 0x441 << 16 )  /* general i/o remote program*/
+#define aoM_hp34970 ( 0x442 << 16 )  /* multi meter 34970*/
+#define aoM_gpibEnet ( 0x443 << 16 )  /* gpibEnet errors*/
+#define aoM_hp437   ( 0x444 << 16 )  /* hp437 errors*/
+#define aoM_ALFAM   ( 0x445 << 16 )  /* alfa motor errors*/
+#define aoM_KHFILT  ( 0x446 << 16 )  /* kronhite filters*/
+#define aoM_MODBUS  ( 0x447 << 16 )  /* modbus errors*/
+#define aoM_PRLX    ( 0x448 << 16 )  /* prologix gpibEnet*/
 /*
  *	errors by module
  *	 format:
@@ -677,6 +688,7 @@ modification history
 #define S_rfIf1_ERROR_SET_WIDTH                       ( aoM_rfIf1     |0x15)
 #define S_rfIf1_ERROR_SET_DRIVE                       ( aoM_rfIf1     |0x16)
 #define S_rfIf1_PWRMETER_NOT_OPEN                     ( aoM_rfIf1     |0x17)
+#define S_rfIf1_LBN_FILTERBANK_ILLEGAL_REQUEST        ( aoM_rfIf1     |0x18)
 /*
  * aoMessage socket program
 */
@@ -725,6 +737,21 @@ modification history
 #define S_pnt_ILLEGAL_SETTLE_TIME_REQUESTED           (aoM_pnt     |0x21)
 #define S_pnt_TD_PITCH_ROLL_COEFF_NOT_INITIALIZED     (aoM_pnt     |0x22)
 #define S_pnt_TD_PITCH_ROLL_COEFF_INIT_BAD_DATA       (aoM_pnt     |0x23)
+#define S_pnt_TER_TRACKING_MUST_STOP_BEFORE_POS       (aoM_pnt     |0x24)
+#define S_pnt_TER_PENDING_PNT_NO_POS_REQ_ALLOWED      (aoM_pnt     |0x25)
+#define S_pnt_TER_ACTIVE_PNT_NO_POS_REQ_ALLOWED       (aoM_pnt     |0x26)
+#define S_pnt_ILLEGAL_TERTIARY_AXIS_REQUESTED         (aoM_pnt     |0x27)
+#define S_pnt_NO_ENCTBLNAME_IN_MODELFILE              (aoM_pnt     |0x28)
+#define S_pnt_ILLEGAL_MAXVEL_FOR_TUR                  (aoM_pnt     |0x29)
+#define S_pnt_EPHM_LD_OPENNING_FILE                   (aoM_pnt     |0x2a)
+#define S_pnt_EPHM_LD_INPUT_DATE                      (aoM_pnt     |0x2b)
+#define S_pnt_EPHM_LD_CONVERTING_DATA                 (aoM_pnt     |0x2c)
+#define S_pnt_EPHM_ILLEGAL_LD_REQUEST                 (aoM_pnt     |0x2d)
+#define S_pnt_EPHM_MALLOC_ERR                         (aoM_pnt     |0x2e)
+#define S_pnt_EPHM_NEED_FILE_LOAD_BEFORE_TRACK        (aoM_pnt     |0x2f)
+#define S_pnt_EPHM_NEED_FILE_LOAD_BEFORE_GET          (aoM_pnt     |0x30)
+#define S_pnt_EPHM_BAD_TIME_GET_REQ                   (aoM_pnt     |0x31)
+
 /*
  * ipdigital i/o
 */
@@ -803,6 +830,7 @@ modification history
 #define S_PRGMGR_SIGNAL_BAD_TASKID                    (aoM_prgMgr |0x19)
 #define S_PRGMGR_MALLOC_REPLY_BUF                     (aoM_prgMgr |0x1a)
 #define S_PRGMGR_NO_PROGRAM_SPECIFIED                 (aoM_prgMgr |0x1b)
+#define S_PRGMGR_PRGNAME_TOO_LONG                     (aoM_prgMgr |0x1c)
 /*
  * gateway program errors
 */
@@ -943,6 +971,23 @@ modification history
 #define  S_IF2_MEASURE_PWR_ILLEGAL_POL                (aoM_if2  | 0x31)
 #define  S_IF2_MEASURE_PWR_ILLEGAL_NUMBER_READS_REQ   (aoM_if2  | 0x32)
 #define  S_IF2_MEASURE_PWR_MALLOC_ERR                 (aoM_if2  | 0x33)
+#define  S_IF2_MIXER5_ILLEGAL_INP_FREQ_REQ            (aoM_if2  | 0x34)
+#define  S_IF2_MIXER6_ILLEGAL_INP_FREQ_REQ            (aoM_if2  | 0x35)
+#define  S_IF2_MIXER7_ILLEGAL_INP_FREQ_REQ            (aoM_if2  | 0x36)
+#define  S_IF2_MIXER8_ILLEGAL_INP_FREQ_REQ            (aoM_if2  | 0x37)
+#define  S_IF2_ILLEGAL_SYNTH5_POS_REQUESTED           (aoM_if2  | 0x38)
+#define  S_IF2_ILLEGAL_SYNTH6_POS_REQUESTED           (aoM_if2  | 0x39)
+#define  S_IF2_ILLEGAL_SYNTH7_POS_REQUESTED           (aoM_if2  | 0x3a)
+#define  S_IF2_ILLEGAL_SYNTH8_POS_REQUESTED           (aoM_if2  | 0x3b)
+#define  S_IF2_ILLEGAL_ILLEGAL_SIGNAL_SRC             (aoM_if2  | 0x3c)
+#define  S_IF2_COULD_NOT_OPEN_SYNTH_DEVICE            (aoM_if2  | 0x3d)
+#define  S_IF2_ILLEGAL_RDRBLANK_VALUE                 (aoM_if2  | 0x3e)
+#define  S_IF2_ILLEGAL_KRONHITE_REQ                   (aoM_if2  | 0x3f)
+#define  S_IF2_KRONHITE_REQ_GT_32_BYTES               (aoM_if2  | 0x40)
+#define  S_IF2_KRONHITE_MALLOC_ERR                    (aoM_if2  | 0x41)
+#define  S_IF2_KRONHITE_DEVICE_2A_NOTOPEN             (aoM_if2  | 0x42)
+#define  S_IF2_KRONHITE_DEVICE_2B_NOTOPEN             (aoM_if2  | 0x43)
+#define  S_IF2_KRONHITE_DEVICE_4A_NOTOPEN             (aoM_if2  | 0x44)
 /*
  * hp83712 synthesizers
 */
@@ -1218,6 +1263,10 @@ modification history
 /**/
 #define  S_AGC_PREPROC_BAD_AXIS_REQUEST                 (aoM_agc   |  0xcc)
 #define  S_AGC_PREPROC_TIME_INCREMENT_BAD               (aoM_agc   |  0xcd)
+
+#define  S_AGC_ILLEGAL_POSLOGGER_REQ                    (aoM_agc   |  0xce)
+#define  S_AGC_ILLEGAL_FASTCBLK_REQ                     (aoM_agc   |  0xcf)
+#define  S_AGC_MALLOC_ERR_RETURNBUF_GEN_QUERY           (aoM_agc   |  0xd0)
 /*
  * irig server
 */
@@ -1226,6 +1275,7 @@ modification history
 #define  S_IRIGSV_CLIENT_LOOPED_MAX_TRIES               (aoM_irigSv|     3)
 #define  S_IRIGSV_CLIENT_TIMEOUT_RCV                    (aoM_irigSv|     4)
 #define  S_IRIGSV_CLIENT_FD_NOT_SET_AFTER_SELECT        (aoM_irigSv|     5)
+#define  S_IRIGSV_CLIENT_TIME_MISMATCH                  (aoM_irigSv|     6)
 /*
  * q routines agc
 */
@@ -1275,6 +1325,20 @@ modification history
 #define  S_IF1P_ILLEGAL_AC1_PWRSWITCH_VALUE             (aoM_if1P  |  0x1f)
 #define  S_IF1P_ILLEGAL_AC2_PWRSWITCH_VALUE             (aoM_if1P  |  0x20)
 #define  S_IF1P_ILLEGAL_LBW_CIR_LINEAR_VALUE            (aoM_if1P  |  0x21)
+#define  S_IF1P_METER_DISP_ILLEGAL_REQ                  (aoM_if1P  |  0x22)
+#define  S_IF1P_METER_DISP_Q_NO_DATA_RETURNED           (aoM_if1P  |  0x23)
+#define  S_IF1P_METER_DISP_Q_MALLOC_ERR                 (aoM_if1P  |  0x24)
+#define  S_IF1P_LBNFB_ERR_RD_POSITION_VOLTAGE           (aoM_if1P  |  0x25)
+#define  S_IF1P_LBNFB_ERR_CONVERT_POSITION_VOLTAGE      (aoM_if1P  |  0x26)
+#define  S_IF1P_LBNFB_MALLOC_QUERY_BUF                  (aoM_if1P  |  0x27)
+#define  S_IF1P_ILLEGAL_LBANDN_FILTER_NUM_REQUESTED     (aoM_if1P  |  0x28)
+#define  S_IF1P_ILLEGAL_SBW_FILTER_NUM_REQUESTED        (aoM_if1P  |  0x29)
+#define  S_IF1P_ILLEGAL_IF1_FREQ                        (aoM_if1P  |  0x2a)
+#define  S_IF1P_ILLEGAL_430FILTER_REQ                   (aoM_if1P  |  0x2b)
+#define  S_IF1P_ILLEGAL_ALFA_FB_REQ                     (aoM_if1P  |  0x2c)
+#define  S_IF1P_ALFA_FB_3488_2_TROUBLE                  (aoM_if1P  |  0x2d)
+#define  S_IF1P_ILLEGAL_CB_CIR_LINEAR_VALUE             (aoM_if1P  |  0x2e)
+#define  S_IF1P_ILLEGAL_327FILTER_REQ                   (aoM_if1P  |  0x2f)
 /*
  * corLProg
 */
@@ -1374,6 +1438,9 @@ modification history
 #define  S_TTT_TIE_MONREQ_DATA_WAS_CHANGING             (aoM_ttt     |0x12)
 #define  S_TTT_TIE_REBOOT_BIT_IN_STATUS_HI              (aoM_ttt     |0x13)
 #define  S_TTT_TIE_MON_POS_MSG_NEEDS_A_REPLY            (aoM_ttt     |0x14)
+#define  S_TTT_TER_MON_REQ_MSG_NEEDS_A_REPLY            (aoM_ttt     |0x15)
+#define  S_TTT_TER_MONREQ_MALLOC_ERR                    (aoM_ttt     |0x16)
+#define  S_TTT_TER_MONREQ_DATA_WAS_CHANGING             (aoM_ttt     |0x17)
 /*
  *  logDLib data logger 
 */
@@ -1391,6 +1458,12 @@ modification history
 #define  S_HP442_ILLEGAL_DEVICE_NUM                     (aoM_hp442  |0x01) 
 #define  S_HP442_ILLEGAL_FREQ_REQ                       (aoM_hp442  |0x02)
 #define  S_HP442_PWR_VALUE_OUT_OF_RANGE                 (aoM_hp442  |0x03)
+/*
+* 	hp 437 power meter
+*/
+#define  S_HP437_ILLEGAL_DEVICE_NUM                     (aoM_hp437  |0x01)
+#define  S_HP437_ILLEGAL_FREQ_REQ                       (aoM_hp437  |0x02)
+#define  S_HP437_PWR_VALUE_OUT_OF_RANGE                 (aoM_hp437  |0x03)
 /*
  *  ipFifo board
 */
@@ -1433,6 +1506,7 @@ modification history
 #define  S_RDRDOP_RXONREQ_AFTER_ECHO_GONE         (aoM_rdrdop |0x10)
 #define  S_RDRDOP_DOPIPP_UPDATE_TOO_SHORT         (aoM_rdrdop |0x11)
 #define  S_RDRDOP_TXLOMULT_BAD                    (aoM_rdrdop |0x12)
+#define  S_RDRDOP_TXRX_DOP_NEEDS_BOTH_STARTTIMES  (aoM_rdrdop |0x13)
 /*
  *  initialize global  data errors 
 */
@@ -1458,6 +1532,8 @@ modification history
 #define  S_SBPROG_MALLOC_ERR_RETURN_BUF           (aoM_rdrdop |0x0b) 
 #define  S_SBPROG_ILLEGAL_DRIVE_SETTING           (aoM_rdrdop |0x0c) 
 #define  S_SBPROG_ILLEGAL_POWER_SETTING           (aoM_rdrdop |0x0d) 
+#define  S_SBPROG_OPS_ER4_BUSY                    (aoM_sbProg |0x0e)
+#define  S_SBPROG_RD_ILLEGAL_DUMP_INDEX           (aoM_sbProg |0x0f)
 /*
  *  epvLib  ephmeris pos/vel errors
 */
@@ -1534,6 +1610,15 @@ modification history
 #define S_TER_RDENC_PE                           (aoM_ter   |   4)
 #define S_TER_RDENC_MIND_ERR                     (aoM_ter   |   5)
 #define S_TER_RDENC_ZIND_ERR                     (aoM_ter   |   6)
+#define S_TER_ILLEGAL_AXIS_REQ                   (aoM_ter   |   7)
+#define S_TER_VTOF_INTEG_LD_RDBACK_MISMATCH      (aoM_ter   |   8)
+#define S_TER_ILLEGAL_COORD_SYSTEM_REQ           (aoM_ter   |   9)
+#define S_TER_ILLEGAL_MODE_REQUEST               (aoM_ter   | 0xa)
+#define S_TER_BAD_TMSTAMP_IN_PRGTRK_REQ          (aoM_ter   | 0xb)
+#define S_TER_BAD_INDEX_REQ                      (aoM_ter   | 0xc)
+#define S_TER_MALLOC_ERR_RETURNBUF_GEN_QUERY     (aoM_ter   | 0xd)
+#define S_TER_DRIVE_WENT_OFFLINE                 (aoM_ter   | 0xe)
+#define S_TER_DRIVE_ENABLE_GLITCH                (aoM_ter   | 0xf)
 
 /*
  * general i/o program
@@ -1543,8 +1628,61 @@ modification history
 #define S_GIO_TIMEOUT_MSG_SEND_TO_REMOTE         (aoM_gio   |   3)
 /*
  * general i/o remote program
-*/
+*/ 
 #define S_GIOR_DEVICE_NOT_OPEN                   (aoM_gior   |   1) 
 #define S_GIOR_ILLEGAL_SOCKET_FD                 (aoM_gior   |   2) 
 #define S_GIOR_BUFLEN_REG_GT_LOCBUF              (aoM_gior   |   3)
+#define S_GIOR_NO_HDRKEYWORD_IN_OUTUBF           (aoM_gior   |   4)
+
+/*
+ * general i/o remote program
+*/
+#define S_HP34970_ILLEGAL_CARD_OR_ADR           (aoM_hp34970   |   1) 
+#define S_HP34970_INPUTDATA_FLOAT_CONVERT_ERR   (aoM_hp34970   |0x02)
+#define S_HP34970_INPUTDATA_99E37_OVERLOAD      (aoM_hp34970   |0x03)
+#define S_HP34970_ILLEGAL_DEVICE_NUM            (aoM_hp34970   |0x04)
+/*
+ * gpib enet device
+*/
+#define S_GPIBENET_ERR_OPENING_CONFIG_FILE      (aoM_gpibEnet  |   1) 
+#define S_GPIBENET_BAD_GPIBADR_CONFIG_FILE      (aoM_gpibEnet  |   2) 
+#define S_GPIBENET_DEVICE_NOT_IN_CONFIG_FILE    (aoM_gpibEnet  |   3) 
+#define S_GPIBENET_EPS_ERR_SEE_IBERR            (aoM_gpibEnet  |   4) 
+#define S_GPIBENET_GPIB_DESCRIPTOR_OUT_OF_RANGE (aoM_gpibEnet  |   5) 
+#define S_GPIBENET_GPIB_DESCRIPTOR_NOT_IN_USE   (aoM_gpibEnet  |   6) 
+/*
+ * alfa motor errors
+*/
+#define S_ALFAM_BAD_FD                          (aoM_ALFAM     |   1) 
+#define S_ALFAM_BYTES_WRITTEN_NOT_EQ_REQUESTED  (aoM_ALFAM     |   2) 
+#define S_ALFAM_BYTES_READ_NOT_EQ_REQUESTED     (aoM_ALFAM     |   3) 
+#define S_ALFAM_WR_WD_TIMEOUT                   (aoM_ALFAM     |   4) 
+#define S_ALFAM_RD_WD_TIMEOUT                   (aoM_ALFAM     |   5) 
+#define S_ALFAM_MALLOC_ERR_INPUT_BUFFER         (aoM_ALFAM     |   6) 
+#define S_ALFAM_VELREQ_OUT_OF_RANGE             (aoM_ALFAM     |   7) 
+#define S_ALFAM_POSREQ_OUT_OF_RANGE             (aoM_ALFAM     |   8) 
+#define S_ALFAM_DCDING_SUMMARY_STAT             (aoM_ALFAM     |   9) 
+#define S_ALFAM_DCDING_EXTD_STAT                (aoM_ALFAM     | 0xa) 
+#define S_ALFAM_DCDING_EXTD_STAT2               (aoM_ALFAM     | 0xb) 
+/*
+ * kronhite filters
+*/
+#define S_KHFILT_BUFOVRFLOW                     (aoM_KHFILT    |   1) 
+/*
+ * ao modbus errors
+*/
+#define S_MODBUS_TOO_MANY_REG_REQUESTED         (aoM_MODBUS    |   1)
+#define S_MODBUS_IDMISMATCH_SEND_RCV            (aoM_MODBUS    |   2)
+#define S_MODBUS_EXCEPTION                      (aoM_MODBUS    |   3)
+#define S_MODBUS_BAD_FC_READBACK                (aoM_MODBUS    |   4)
+#define S_MODBUS_WR_RDBACK_MISMATCH_ADR         (aoM_MODBUS    |   5)
+#define S_MODBUS_WR_RDBACK_MISMATCH_NREG        (aoM_MODBUS    |   6)
+#define S_MODBUS_TMOUT_SELECT_READBYTES         (aoM_MODBUS    |   7)
+/*
+ * prologix gpibenet errors
+*/
+#define S_PRLX_NO_CTRL_SLOTS_LEFT               (aoM_PRLX      |   1)
+#define S_PRLX_NO_DEV_SLOTS_LEFT                (aoM_PRLX      |   2)
+#define S_PRLX_BAD_DESCRIPTOR                   (aoM_PRLX      |   3)
+
 #endif	/* INCaoErrNumh */

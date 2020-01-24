@@ -1,5 +1,6 @@
 #ifndef INCconvLibh
 #define INCconvLibh
+#include	<phlibExtras.h>
 /* 290ct93,pjp - all routines that handle h,m,s or d,m,s must pass in,or
 *                pass back isign. This required some routines to have
 *	         there number of arguments changed
@@ -23,6 +24,7 @@ void    fmtSMToHmsD(double secMidnite,int secFracDig,char *cformatted);
 
 void   IsecMid_hms3(int isecs,int *hh,int *mm,int *iss);
 void   secMid_hms3(double secs,int *hh,int *mm,double *ss);
+void   sec1970_ymd_secMid(double sec1970,int *pyyyymmdd,double *psecMid);
 int    isLeapYear(int year);
 void   IminMid_hm2(int min,int *hh,int *mm);
 int    hm2_IminMid(int hh,int mm);
