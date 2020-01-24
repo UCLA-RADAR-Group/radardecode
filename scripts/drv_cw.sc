@@ -166,8 +166,8 @@ while ( $fifoToUse <= $numpol )
     stripVme -h -o $scannum -n 1 -g "$firstrec $lastrec" < $inpfile |\
     unpriVtoi4 -b $bits -i $numpol -f $fifoToUse -d 3 |\
     cat -s tmp$$ - |\
-    #$stem/convdatatype -q -i i4 -o f4 |\
-    i4tor4|zerofill $nofillflag -b 8 -i $fftlen -o $fftlen |\
+    convdatatype -q -i i4 -o f4 |\
+    zerofill $nofillflag -b 8 -i $fftlen -o $fftlen |\
     fftfilter -d f -n $fftlen -s $numskip |\
     power_ao |\
     avgdata -d r4 -g $fftlen -h $nfftave $ignore |\

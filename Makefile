@@ -10,7 +10,7 @@ FFLAGS=-O
 LPATH=$(HOME)/lib
 CC=gcc
 
-all: libunpack scripts radardecode rotate radarfft radarcplxfft selectpnts comppncode compdsncode compbarkercode scaletosigma makefits mapsmerge avgdata stripVme unpriVtoi4 i4tor4 zerofill fftfilter power power_ao
+all: libunpack scripts radardecode rotate radarfft radarcplxfft selectpnts comppncode compdsncode compbarkercode scaletosigma makefits mapsmerge avgdata stripVme unpriVtoi4 i4tor4 zerofill fftfilter power power_ao convdatatype
 
 FORCE:
 	
@@ -81,6 +81,9 @@ power: power.c read_pipe.o
 
 power_ao: power_ao.c read_pipe.o 
 	$(CC) $(CFLAGS) power_ao.c read_pipe.o -lm -o $(GLOBDIR)/power_ao
+
+convdatatype: convdatatype.c 
+	$(CC) $(CFLAGS) convdatatype.c read_pipe.o to_lowercase.o -lm -o $(GLOBDIR)/convdatatype
 
 fftwAo.o:	 fftwAo.c ;     $(CC) $(CFLAGS) -c fftwAo.c
 writen.o:	 writen.c ;     $(CC) $(CFLAGS) -c writen.c
