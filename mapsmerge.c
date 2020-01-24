@@ -1,6 +1,8 @@
 #include        <stdio.h>
+#include        <stdlib.h>
 #include        <fcntl.h>
 #include        <malloc.h>
+#include        <string.h>
 #include    <unistd.h>
 #include    <philLib.h>
 
@@ -9,15 +11,13 @@
 #define  MAXMAPS 100
 #define TRUE 1
 #define FALSE 0
+#ifndef MIN
 #define MIN(a,b) ((a)<(b))?(a):(b)
+#endif
 
 int     inputmaps(char *filelist,int bytesinmap,float **mapArr);
 void    processargs(int argc,char **argv,int *pinRows,int *pinCols,
 					int *pinNumMapsHor,char *fileList,int *pdoZero);
-
-/* revision control variable */
-static char const rcsid[] = 
-"$Id$";
 
 int main(int argc,char **argv)
 {
@@ -252,7 +252,6 @@ int     *pdoZero)                               /* put line of zeros*/
 /*
         here if illegal option or argument
 */
-errout: fprintf(stderr,"%s\n",rcsid);
-        fprintf(stderr,"%s\n",USAGE);
+errout: fprintf(stderr,"%s\n",USAGE);
         exit(1);
 }
