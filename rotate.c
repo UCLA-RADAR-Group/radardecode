@@ -1,10 +1,10 @@
 #include        <stdio.h>
+#include        <stdlib.h>
 #include        <fcntl.h>
 #include        <malloc.h>
 #include <unistd.h>
 #include <philLib.h> 
-#include        <stdlib.h>
-
+ 
 
 #define STDOUT 1
 #define  min(a,b)   ( (a) < (b) ? (a) : (b) )
@@ -15,11 +15,7 @@
 void    processargs(int argc,char **argv,int *bytes_per_pnt,int *pnts_in_ipp,
                                         int     *pnts_to_rotate);
 
-/* revision control variable */
-static char const rcsid[] = 
-"$Id$";
-
-int main(int argc,char **argv)
+ int main(int argc,char **argv)
 {
 /*
  *      Rotate points within ipp.
@@ -199,7 +195,6 @@ int     *pnts_to_rotate)
 /*
         here if illegal option or argument
 */
-errout: fprintf(stderr,"%s\n",rcsid);
-        fprintf(stderr,"%s\n",USAGE);
+errout: fprintf(stderr,"%s\n",USAGE);
         exit(1);
 }
