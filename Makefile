@@ -10,7 +10,7 @@ FFLAGS=-O
 LPATH=$(HOME)/lib
 CC=gcc
 
-all: libunpack scripts radardecode rotate radarfft radarcplxfft selectpnts comppncode compdsncode compbarkercode scaletosigma makefits mapsmerge avgdata stripVme unpriVtoi4 i4tor4 zerofill fftfilter power power_ao convdatatype
+all: libunpack scripts radardecode rotate radarfft radarcplxfft selectpnts comppncode compdsncode compbarkercode scaletosigma makefits mapsmerge avgdata stripVme unpriV unpriVtoi4 i4tor4 zerofill fftfilter power power_ao convdatatype
 
 FORCE:
 	
@@ -63,6 +63,8 @@ avgdata: avgdata.c read_pipe.o to_lowercase.o
 
 stripVme: stripVme.c read_pipe.o hdrLib.h
 	$(CC) $(CFLAGS) stripVme.c read_pipe.o -o $(GLOBDIR)/stripVme
+unpriV: unpriV.c read_pipe.o unpriV_i4.o unpriV_f4.o unpriV_i2.o unpriV_d8.o 
+	$(CC) $(CFLAGS) unpriV.c read_pipe.o unpriV_i4.o unpriV_f4.o unpriV_i2.o unpriV_d8.o -o $(GLOBDIR)/unpriV
 
 unpriVtoi4: unpriVtoi4.c read_pipe.o unpriV_i4.o
 	$(CC) $(CFLAGS) unpriVtoi4.c read_pipe.o unpriV_i4.o -o $(GLOBDIR)/unpriVtoi4
@@ -89,6 +91,8 @@ fftwAo.o:	 fftwAo.c ;     $(CC) $(CFLAGS) -c fftwAo.c
 writen.o:	 writen.c ;     $(CC) $(CFLAGS) -c writen.c
 unpriV_f4.o:	 unpriV_f4.c ;  $(CC) $(CFLAGS) -c unpriV_f4.c
 unpriV_i4.o:	 unpriV_i4.c ;  $(CC) $(CFLAGS) -c unpriV_i4.c
+unpriV_i2.o:	 unpriV_i2.c ;  $(CC) $(CFLAGS) -c unpriV_i2.c
+unpriV_d8.o:	 unpriV_d8.c ;  $(CC) $(CFLAGS) -c unpriV_d8.c
 read_pipe.o:	 read_pipe.c ;	$(CC) $(CFLAGS) -c read_pipe.c
 fitsCmpScl.o:	 fitsCmpScl.c ; $(CC) $(CFLAGS) -c fitsCmpScl.c
 fitsOutData.o:	 fitsOutData.c ;$(CC) $(CFLAGS) -c fitsOutData.c

@@ -1,13 +1,6 @@
-#ifdef VXWORKS
-#include	<vxWorks.h>
-#else
-#include	<vxWorksEm.h>
-#endif
-#include	<riLib.h>
-#include	<unpri.h>
-#ifdef LINUX
-#include        <byteswap.h>
-#endif
+#include    <datkLib.h>
+#include    <unpri.h>
+#include    <byteswap.h>
 /*****************************************************************************
 *unpriV_i4 -  unpack vmeRi data to ints   
 *
@@ -72,10 +65,13 @@ static  int   lkup_4[16] = {0,1,2,3,4,5,6,7,-8,-7,-6,-5,-4,-3,
 			      -2,-1};
 	short   *inPtrI1,*inPtrQ1;
 	short   *inPtrI2,*inPtrQ2;
-#ifdef LINUX
     unsigned short swi1,swq1;
     unsigned short swi2,swq2;
-#endif
+/*  12 (16 bit) needs to used signed variable so we sign
+    extend into  the 32bits
+*/
+    short swi1S,swq1S;
+    short swi2S,swq2S;
 	int   *outPtrI1,*outPtrQ1;
 	int   *outPtrI2,*outPtrQ2;
 	int  	instep;		/* number shorts between inputs 1 dig*/
@@ -136,75 +132,50 @@ static  int   lkup_4[16] = {0,1,2,3,4,5,6,7,-8,-7,-6,-5,-4,-3,
 	    switch (bits) {
 	      case 1:
 	        for (i=0;i<numwrds;i++){
-#ifdef LINUX
                 swi1=bswap_16(*inPtrI1);
                 swq1=bswap_16(*inPtrQ1);
                 unpri_1(swi1,outPtrI1,outStep);
                 unpri_1(swq1,outPtrQ1,outStep);
-#else
-	  	  unpri_1(*inPtrI1,outPtrI1,outStep);
-		  unpri_1(*inPtrQ1,outPtrQ1,outStep);
-#endif
 		  inPtrI1+=instep;
 		  inPtrQ1+=instep;	
 	        }
 	        break;
 	      case 2:
 	        for (i=0;i<numwrds;i++){
-#ifdef LINUX
           swi1=bswap_16(*inPtrI1);
           swq1=bswap_16(*inPtrQ1);
           unpri_2(swi1,outPtrI1,outStep);
           unpri_2(swq1,outPtrQ1,outStep);
-#else
-	  	  unpri_2(*inPtrI1,outPtrI1,outStep);
-		  unpri_2(*inPtrQ1,outPtrQ1,outStep);
-#endif
 		  inPtrI1+=instep;
 		  inPtrQ1+=instep;	
 	        }
 	        break;
 	      case 4:
 	        for (i=0;i<numwrds;i++){
-#ifdef LINUX
           swi1=bswap_16(*inPtrI1);
           swq1=bswap_16(*inPtrQ1);
           unpri_4(swi1,outPtrI1,outStep);
           unpri_4(swq1,outPtrQ1,outStep);
-#else
-	  	  unpri_4(*inPtrI1,outPtrI1,outStep);
-		  unpri_4(*inPtrQ1,outPtrQ1,outStep);
-#endif
 		  inPtrI1+=instep;
 		  inPtrQ1+=instep;	
 	        }
 	        break;
 	      case 8:
 	        for (i=0;i<numwrds;i++){
-#ifdef LINUX
           swi1=bswap_16(*inPtrI1);
           swq1=bswap_16(*inPtrQ1);
           unpri_8(swi1,outPtrI1,outStep);
           unpri_8(swq1,outPtrQ1,outStep);
-#else
-	  	  unpri_8(*inPtrI1,outPtrI1,outStep);
-		  unpri_8(*inPtrQ1,outPtrQ1,outStep);
-#endif
 		  inPtrI1+=instep;	
 		  inPtrQ1+=instep;
 	        }
 	        break;
 	      case 12:
 	        for (i=0;i<numwrds;i++){
-#ifdef LINUX
-          swi1=bswap_16(*inPtrI1);
-          swq1=bswap_16(*inPtrQ1);
-          unpri_12(swi1,outPtrI1,outStep);
-          unpri_12(swq1,outPtrQ1,outStep);
-#else
-	  	  unpri_12(*inPtrI1,outPtrI1,outStep);
-		  unpri_12(*inPtrQ1,outPtrQ1,outStep);
-#endif
+          swi1S=bswap_16(*inPtrI1);
+          swq1S=bswap_16(*inPtrQ1);
+          unpri_12(swi1S,outPtrI1,outStep);
+          unpri_12(swq1S,outPtrQ1,outStep);
 		  inPtrI1+=instep;
 		  inPtrQ1+=instep;	
 	        }
@@ -238,7 +209,6 @@ static  int   lkup_4[16] = {0,1,2,3,4,5,6,7,-8,-7,-6,-5,-4,-3,
             switch (bits) {
               case 1:
                 for (i=0;i<numwrds/2;i++){
-#ifdef LINUX
                   swi1=bswap_16(*inPtrI1);
                   swq1=bswap_16(*inPtrQ1);
                   swi2=bswap_16(*inPtrI2);
@@ -247,12 +217,6 @@ static  int   lkup_4[16] = {0,1,2,3,4,5,6,7,-8,-7,-6,-5,-4,-3,
                   unpri_1(swq1,outPtrQ1,outStep);
                   unpri_1(swi2,outPtrI2,outStep);
                   unpri_1(swq2,outPtrQ2,outStep);
-#else
-                  unpri_1(*inPtrI1,outPtrI1,outStep);
-                  unpri_1(*inPtrQ1,outPtrQ1,outStep);
-                  unpri_1(*inPtrI2,outPtrI2,outStep);
-                  unpri_1(*inPtrQ2,outPtrQ2,outStep);
-#endif
                   inPtrI1+=instep;
                   inPtrQ1+=instep;
                   inPtrI2+=instep;
@@ -261,7 +225,6 @@ static  int   lkup_4[16] = {0,1,2,3,4,5,6,7,-8,-7,-6,-5,-4,-3,
                 break;
               case 2:
                 for (i=0;i<numwrds/2;i++){
-#ifdef LINUX
                   swi1=bswap_16(*inPtrI1);
                   swq1=bswap_16(*inPtrQ1);
                   swi2=bswap_16(*inPtrI2);
@@ -270,12 +233,6 @@ static  int   lkup_4[16] = {0,1,2,3,4,5,6,7,-8,-7,-6,-5,-4,-3,
                   unpri_2(swq1,outPtrQ1,outStep);
                   unpri_2(swi2,outPtrI2,outStep);
                   unpri_2(swq2,outPtrQ2,outStep);
-#else
-                  unpri_2(*inPtrI1,outPtrI1,outStep);
-                  unpri_2(*inPtrQ1,outPtrQ1,outStep);
-                  unpri_2(*inPtrI2,outPtrI2,outStep);
-                  unpri_2(*inPtrQ2,outPtrQ2,outStep);
-#endif
                   inPtrI1+=instep;
                   inPtrQ1+=instep;
                   inPtrI2+=instep;
@@ -284,7 +241,6 @@ static  int   lkup_4[16] = {0,1,2,3,4,5,6,7,-8,-7,-6,-5,-4,-3,
                 break;
               case 4:
                 for (i=0;i<numwrds/2;i++){
-#ifdef LINUX
                   swi1=bswap_16(*inPtrI1);
                   swq1=bswap_16(*inPtrQ1);
                   swi2=bswap_16(*inPtrI2);
@@ -293,12 +249,6 @@ static  int   lkup_4[16] = {0,1,2,3,4,5,6,7,-8,-7,-6,-5,-4,-3,
                   unpri_4(swq1,outPtrQ1,outStep);
                   unpri_4(swi2,outPtrI2,outStep);
                   unpri_4(swq2,outPtrQ2,outStep);
-#else
-                  unpri_4(*inPtrI1,outPtrI1,outStep);
-                  unpri_4(*inPtrQ1,outPtrQ1,outStep);
-                  unpri_4(*inPtrI2,outPtrI2,outStep);
-                  unpri_4(*inPtrQ2,outPtrQ2,outStep);
-#endif
                   inPtrI1+=instep;
                   inPtrQ1+=instep;
                   inPtrI2+=instep;
@@ -307,7 +257,6 @@ static  int   lkup_4[16] = {0,1,2,3,4,5,6,7,-8,-7,-6,-5,-4,-3,
                 break;
 	      case 8:
 	        for (i=0;i<numwrds/2;i++){
-#ifdef LINUX
                   swi1=bswap_16(*inPtrI1);
                   swq1=bswap_16(*inPtrQ1);
                   swi2=bswap_16(*inPtrI2);
@@ -316,12 +265,6 @@ static  int   lkup_4[16] = {0,1,2,3,4,5,6,7,-8,-7,-6,-5,-4,-3,
                   unpri_8(swq1,outPtrQ1,outStep);
                   unpri_8(swi2,outPtrI2,outStep);
                   unpri_8(swq2,outPtrQ2,outStep);
-#else
-	  	  unpri_8(*inPtrI1,outPtrI1,outStep);
-		  unpri_8(*inPtrQ1,outPtrQ1,outStep);
-	  	  unpri_8(*inPtrI2,outPtrI2,outStep);
-		  unpri_8(*inPtrQ2,outPtrQ2,outStep);
-#endif
 		  inPtrI1+=instep;
 		  inPtrQ1+=instep;
 		  inPtrI2+=instep;
@@ -330,21 +273,14 @@ static  int   lkup_4[16] = {0,1,2,3,4,5,6,7,-8,-7,-6,-5,-4,-3,
 	        break;
 	      case 12:
 	        for (i=0;i<numwrds/2;i++){
-#ifdef LINUX
-                  swi1=bswap_16(*inPtrI1);
-                  swq1=bswap_16(*inPtrQ1);
-                  swi2=bswap_16(*inPtrI2);
-                  swq2=bswap_16(*inPtrQ2);
-				  unpri_12(swi1,outPtrI1,outStep); 
-                  unpri_12(swq1,outPtrQ1,outStep);
-                  unpri_12(swi2,outPtrI2,outStep);
-                  unpri_12(swq2,outPtrQ2,outStep);
-#else
-	  	  unpri_12(*inPtrI1,outPtrI1,outStep);
-		  unpri_12(*inPtrQ1,outPtrQ1,outStep);
-	  	  unpri_12(*inPtrI2,outPtrI2,outStep);
-		  unpri_12(*inPtrQ2,outPtrQ2,outStep);
-#endif
+                  swi1S=bswap_16(*inPtrI1);
+                  swq1S=bswap_16(*inPtrQ1);
+                  swi2S=bswap_16(*inPtrI2);
+                  swq2S=bswap_16(*inPtrQ2);
+				  unpri_12(swi1S,outPtrI1,outStep); 
+                  unpri_12(swq1S,outPtrQ1,outStep);
+                  unpri_12(swi2S,outPtrI2,outStep);
+                  unpri_12(swq2S,outPtrQ2,outStep);
 		  inPtrI1+=instep;
 		  inPtrQ1+=instep;	
 		  inPtrI2+=instep;

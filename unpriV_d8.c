@@ -1,13 +1,11 @@
-#include	<datkLib.h>
-#include	<unpri.h>
+#include    <datkLib.h>
+#include    <unpri.h>
 #include    <byteswap.h>
 /*****************************************************************************
-*unpriV_f4 -  unpack vmeRi data to floats
+*unpriV_d8 -  unpack vmeRi data to double 
 *
 *DESCRIPTION
-*Unpack vme ri data to float.
-* return 0 ok
-*        -1 error
+*Unpack vme ri data to doubles.
 *	
 *	 numfifos = 1  
 *	    iqSepReg != 0
@@ -27,16 +25,16 @@
 *              all fifo2 data to  outPtr2.
 *	        order is i1f1,q1f1,i2f1,q2f1....  outptr1
 */
-int    	unpriV_f4(
+STATUS 	unpriV_d8(
 	int     numwrds,	/* # of 32 bit input words*/
 	int     numFifos,	/* 1 or 2*/
 	int	bits,		/* packing*/
 	int     iqSepReg,       /* false --> i,q in same reg*/
 	char	*inPtr,		/* ptr to input */
-	float  *outPtr1,	/* ptr to output 1 */
-	float  *outPtr2,	/* ptr to output 2 */
-	float  *outPtr3,	/* ptr to output 3 if 2 fifos*/
-	float  *outPtr4)	/* ptr to output 4 if 2 fifos*/
+	double *outPtr1,	/* ptr to output 1 */
+	double *outPtr2,	/* ptr to output 2 */
+	double *outPtr3,	/* ptr to output 3 if 2 fifos*/
+	double *outPtr4)	/* ptr to output 4 if 2 fifos*/
 {
 /*   	- inptr holds 16 bit data from the vme ri
 	- unpack the data into doubles  words
@@ -44,48 +42,52 @@ int    	unpriV_f4(
  *	        order is i1f2,q1f2,i2f2,q2f2....  outptr1
 history:
 	25apr93. add iq interleave option and outbufs 1,2,3,4.
-	10jun04  added  linux option 
+	10jun04. added linux ifdefs
 	15may06 linux 2 fifos was not swapping the bytes (the swap
             command was there but the unpack macro used the unswapped ptr. 
-            eg: swi1=bswap_16(*inPtrI1);
+            eg:
+            swi1=bswap_16(*inPtrI1);
             unpri_1(*inPtrI1,outPtrI1,outStep); instead of :
             unpri_1(swi1,outPtrI1,outStep);
             So all 2fifo ri data was wrong except for 
             8bit where you had two samples per baud since the output  was
             i2,i1,i4,i3,  and if i(n) eq i (n+1) then it was ok
+
 	   
 */
-static  float   lkup_1[2]={1.,-1.};
-static  float   lkup_2[4] = {0.,1.,-2.,-1.};
-static  float   lkup_4[16] = {0.,1.,2.,3.,4.,5.,6.,7.,-8.,-7.,-6.,-5.,-4.,-3.,
+static  double  lkup_1[2]={1.,-1.};
+static  double  lkup_2[4] = {0.,1.,-2.,-1.};
+static  double  lkup_4[16] = {0.,1.,2.,3.,4.,5.,6.,7.,-8.,-7.,-6.,-5.,-4.,-3.,
 			      -2.,-1.};
 	short   *inPtrI1,*inPtrQ1;
 	short   *inPtrI2,*inPtrQ2;
-    unsigned short swi1,swq1;
-    unsigned short swi2,swq2;
+	unsigned short swi1,swq1;
+	unsigned short swi2,swq2;
 	short swi1S,swq1S;
     short swi2S,swq2S;
-	float   *outPtrI1,*outPtrQ1;
-	float   *outPtrI2,*outPtrQ2;
+	double  *outPtrI1,*outPtrQ1;
+	double  *outPtrI2,*outPtrQ2;
 	int  	instep;		/* number shorts between inputs 1 dig*/
 	int  	outStep;	/* number double between outputs 1 dig*/
 	int     i;
+
 /*
  *	check that inputs were reasonable, if not, return ERROR (-1);
 */
+
 	switch(numFifos){
 	      case 1:
- 	           if ((outPtr1==(float  *)NULL)) goto errout;
+ 	           if ((outPtr1==(double *)NULL)) goto errout;
 	           if (iqSepReg) {
- 	              if (outPtr2==(float  *)NULL)goto errout;
+ 	              if (outPtr2==(double *)NULL)goto errout;
 		   }
 	           break;
 	      case 2:
- 	             if ((outPtr1==(float  *)NULL) || 
- 	                 (outPtr2==(float  *)NULL)) goto errout;
+ 	             if ((outPtr1==(double *)NULL) || 
+ 	                 (outPtr2==(double *)NULL)) goto errout;
 	             if (iqSepReg) {
- 	                if ((outPtr3==(float  *)NULL) || 
- 	                    (outPtr4==(float  *)NULL)) goto errout;
+ 	                if ((outPtr3==(double *)NULL) || 
+ 	                    (outPtr4==(double *)NULL)) goto errout;
 		     }
 		     break;
 	      default:
@@ -124,50 +126,50 @@ static  float   lkup_4[16] = {0.,1.,2.,3.,4.,5.,6.,7.,-8.,-7.,-6.,-5.,-4.,-3.,
 	    switch (bits) {
 	      case 1:
 	        for (i=0;i<numwrds;i++){
-                swi1=bswap_16(*inPtrI1);
-                swq1=bswap_16(*inPtrQ1);
-                unpri_1(swi1,outPtrI1,outStep);
-                unpri_1(swq1,outPtrQ1,outStep);
+		  		swi1=bswap_16(*inPtrI1);
+		  		swq1=bswap_16(*inPtrQ1);
+	  	  		unpri_1(swi1,outPtrI1,outStep);
+		  		unpri_1(swq1,outPtrQ1,outStep);
 		  		inPtrI1+=instep;
 		  		inPtrQ1+=instep;	
 	        }
 	        break;
 	      case 2:
 	        for (i=0;i<numwrds;i++){
-          		swi1=bswap_16(*inPtrI1);
-          		swq1=bswap_16(*inPtrQ1);
-          		unpri_2(swi1,outPtrI1,outStep);
-          		unpri_2(swq1,outPtrQ1,outStep);
-		  		inPtrI1+=instep;
-		  		inPtrQ1+=instep;	
+		  swi1=bswap_16(*inPtrI1);
+		  swq1=bswap_16(*inPtrQ1);
+	  	  unpri_2(swi1,outPtrI1,outStep);
+		  unpri_2(swq1,outPtrQ1,outStep);
+		  inPtrI1+=instep;
+		  inPtrQ1+=instep;	
 	        }
 	        break;
 	      case 4:
 	        for (i=0;i<numwrds;i++){
-          swi1=bswap_16(*inPtrI1);
-          swq1=bswap_16(*inPtrQ1);
-          unpri_4(swi1,outPtrI1,outStep);
-          unpri_4(swq1,outPtrQ1,outStep);
+		  swi1=bswap_16(*inPtrI1);
+		  swq1=bswap_16(*inPtrQ1);
+	  	  unpri_4(swi1,outPtrI1,outStep);
+		  unpri_4(swq1,outPtrQ1,outStep);
 		  inPtrI1+=instep;
 		  inPtrQ1+=instep;	
 	        }
 	        break;
 	      case 8:
 	        for (i=0;i<numwrds;i++){
-          swi1=bswap_16(*inPtrI1);
-          swq1=bswap_16(*inPtrQ1);
-          unpri_8(swi1,outPtrI1,outStep);
-          unpri_8(swq1,outPtrQ1,outStep);
+		  swi1=bswap_16(*inPtrI1);
+		  swq1=bswap_16(*inPtrQ1);
+	  	  unpri_8(swi1,outPtrI1,outStep);
+		  unpri_8(swq1,outPtrQ1,outStep);
 		  inPtrI1+=instep;	
 		  inPtrQ1+=instep;
 	        }
 	        break;
 	      case 12:
 	        for (i=0;i<numwrds;i++){
-          swi1S=bswap_16(*inPtrI1);
-          swq1S=bswap_16(*inPtrQ1);
-          unpri_12(swi1S,outPtrI1,outStep);
-          unpri_12(swq1S,outPtrQ1,outStep);
+		  swi1S=bswap_16(*inPtrI1);
+		  swq1S=bswap_16(*inPtrQ1);
+	  	  unpri_12(swi1S,outPtrI1,outStep);
+		  unpri_12(swq1S,outPtrQ1,outStep);
 		  inPtrI1+=instep;
 		  inPtrQ1+=instep;	
 	        }
@@ -200,13 +202,13 @@ static  float   lkup_4[16] = {0.,1.,2.,3.,4.,5.,6.,7.,-8.,-7.,-6.,-5.,-4.,-3.,
             switch (bits) {
               case 1:
                 for (i=0;i<numwrds/2;i++){
-                  swi1=bswap_16(*inPtrI1);
-                  swq1=bswap_16(*inPtrQ1);
-                  swi2=bswap_16(*inPtrI2);
-                  swq2=bswap_16(*inPtrQ2);
-				  unpri_1(swi1,outPtrI1,outStep);
-            	  unpri_1(swq1,outPtrQ1,outStep);
-            	  unpri_1(swi2,outPtrI2,outStep);
+		  		  swi1=bswap_16(*inPtrI1);
+		  		  swq1=bswap_16(*inPtrQ1);
+		  		  swi2=bswap_16(*inPtrI2);
+		  		  swq2=bswap_16(*inPtrQ2);
+                  unpri_1(swi1,outPtrI1,outStep);
+                  unpri_1(swq1,outPtrQ1,outStep);
+                  unpri_1(swi2,outPtrI2,outStep);
                   unpri_1(swq2,outPtrQ2,outStep);
                   inPtrI1+=instep;
                   inPtrQ1+=instep;
@@ -216,13 +218,13 @@ static  float   lkup_4[16] = {0.,1.,2.,3.,4.,5.,6.,7.,-8.,-7.,-6.,-5.,-4.,-3.,
                 break;
               case 2:
                 for (i=0;i<numwrds/2;i++){
-                  swi1=bswap_16(*inPtrI1);
-                  swq1=bswap_16(*inPtrQ1);
-                  swi2=bswap_16(*inPtrI2);
-                  swq2=bswap_16(*inPtrQ2);
+		  		  swi1=bswap_16(*inPtrI1);
+		  		  swq1=bswap_16(*inPtrQ1);
+		  		  swi2=bswap_16(*inPtrI2);
+		  		  swq2=bswap_16(*inPtrQ2);
 				  unpri_2(swi1,outPtrI1,outStep);
-                  unpri_2(swq1,outPtrQ1,outStep);
-                  unpri_2(swi2,outPtrI2,outStep);
+            	  unpri_2(swq1,outPtrQ1,outStep);
+            	  unpri_2(swi2,outPtrI2,outStep);
                   unpri_2(swq2,outPtrQ2,outStep);
                   inPtrI1+=instep;
                   inPtrQ1+=instep;
@@ -232,15 +234,14 @@ static  float   lkup_4[16] = {0.,1.,2.,3.,4.,5.,6.,7.,-8.,-7.,-6.,-5.,-4.,-3.,
                 break;
               case 4:
                 for (i=0;i<numwrds/2;i++){
-                  swi1=bswap_16(*inPtrI1);
-                  swq1=bswap_16(*inPtrQ1);
-                  swi2=bswap_16(*inPtrI2);
-                  swq2=bswap_16(*inPtrQ2);
+		  		  swi1=bswap_16(*inPtrI1);
+		  		  swq1=bswap_16(*inPtrQ1);
+		  		  swi2=bswap_16(*inPtrI2);
+		  		  swq2=bswap_16(*inPtrQ2);
 				  unpri_4(swi1,outPtrI1,outStep);
                   unpri_4(swq1,outPtrQ1,outStep);
                   unpri_4(swi2,outPtrI2,outStep);
                   unpri_4(swq2,outPtrQ2,outStep);
-
                   inPtrI1+=instep;
                   inPtrQ1+=instep;
                   inPtrI2+=instep;
@@ -249,11 +250,11 @@ static  float   lkup_4[16] = {0.,1.,2.,3.,4.,5.,6.,7.,-8.,-7.,-6.,-5.,-4.,-3.,
                 break;
 	      case 8:
 	        for (i=0;i<numwrds/2;i++){
-                  swi1=bswap_16(*inPtrI1);
-                  swq1=bswap_16(*inPtrQ1);
-                  swi2=bswap_16(*inPtrI2);
-                  swq2=bswap_16(*inPtrQ2);
-				  unpri_8(swi1,outPtrI1,outStep); 
+		  		  swi1=bswap_16(*inPtrI1);
+		  		  swq1=bswap_16(*inPtrQ1);
+		  		  swi2=bswap_16(*inPtrI2);
+		  		  swq2=bswap_16(*inPtrQ2);
+				  unpri_8(swi1,outPtrI1,outStep);
                   unpri_8(swq1,outPtrQ1,outStep);
                   unpri_8(swi2,outPtrI2,outStep);
                   unpri_8(swq2,outPtrQ2,outStep);
@@ -265,10 +266,10 @@ static  float   lkup_4[16] = {0.,1.,2.,3.,4.,5.,6.,7.,-8.,-7.,-6.,-5.,-4.,-3.,
 	        break;
 	      case 12:
 	        for (i=0;i<numwrds/2;i++){
-                  swi1S=bswap_16(*inPtrI1);
-                  swq1S=bswap_16(*inPtrQ1);
-                  swi2S=bswap_16(*inPtrI2);
-                  swq2S=bswap_16(*inPtrQ2);
+		  		  swi1S=bswap_16(*inPtrI1);
+		  		  swq1S=bswap_16(*inPtrQ1);
+		  		  swi2S=bswap_16(*inPtrI2);
+		  		  swq2S=bswap_16(*inPtrQ2);
 				  unpri_12(swi1S,outPtrI1,outStep); 
                   unpri_12(swq1S,outPtrQ1,outStep);
                   unpri_12(swi2S,outPtrI2,outStep);
@@ -282,6 +283,6 @@ static  float   lkup_4[16] = {0.,1.,2.,3.,4.,5.,6.,7.,-8.,-7.,-6.,-5.,-4.,-3.,
 	  }
 	  break;
 	}
-	return(0);
-errout: return(-1);
+	return(OK);
+errout: return(ERROR);
 } 

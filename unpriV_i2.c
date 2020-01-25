@@ -1,13 +1,11 @@
-#include	<datkLib.h>
-#include	<unpri.h>
+#include    <datkLib.h>
+#include    <unpri.h>
 #include    <byteswap.h>
 /*****************************************************************************
-*unpriV_f4 -  unpack vmeRi data to floats
+*unpriV_i2 -  unpack vmeRi data to shorts
 *
 *DESCRIPTION
-*Unpack vme ri data to float.
-* return 0 ok
-*        -1 error
+*Unpack vme ri data to short.
 *	
 *	 numfifos = 1  
 *	    iqSepReg != 0
@@ -27,16 +25,16 @@
 *              all fifo2 data to  outPtr2.
 *	        order is i1f1,q1f1,i2f1,q2f1....  outptr1
 */
-int    	unpriV_f4(
+STATUS 	unpriV_i2(
 	int     numwrds,	/* # of 32 bit input words*/
 	int     numFifos,	/* 1 or 2*/
 	int	bits,		/* packing*/
 	int     iqSepReg,       /* false --> i,q in same reg*/
 	char	*inPtr,		/* ptr to input */
-	float  *outPtr1,	/* ptr to output 1 */
-	float  *outPtr2,	/* ptr to output 2 */
-	float  *outPtr3,	/* ptr to output 3 if 2 fifos*/
-	float  *outPtr4)	/* ptr to output 4 if 2 fifos*/
+	short  *outPtr1,	/* ptr to output 1 */
+	short  *outPtr2,	/* ptr to output 2 */
+	short  *outPtr3,	/* ptr to output 3 if 2 fifos*/
+	short  *outPtr4)	/* ptr to output 4 if 2 fifos*/
 {
 /*   	- inptr holds 16 bit data from the vme ri
 	- unpack the data into doubles  words
@@ -44,29 +42,35 @@ int    	unpriV_f4(
  *	        order is i1f2,q1f2,i2f2,q2f2....  outptr1
 history:
 	25apr93. add iq interleave option and outbufs 1,2,3,4.
-	10jun04  added  linux option 
+	21aug95. changed lkup table entries to ints
+	10jun04. added linux compile option
 	15may06 linux 2 fifos was not swapping the bytes (the swap
-            command was there but the unpack macro used the unswapped ptr. 
+            command was there but the unpack macro used the unswapped ptr.
             eg: swi1=bswap_16(*inPtrI1);
             unpri_1(*inPtrI1,outPtrI1,outStep); instead of :
             unpri_1(swi1,outPtrI1,outStep);
             So all 2fifo ri data was wrong except for 
             8bit where you had two samples per baud since the output  was
             i2,i1,i4,i3,  and if i(n) eq i (n+1) then it was ok
-	   
 */
-static  float   lkup_1[2]={1.,-1.};
-static  float   lkup_2[4] = {0.,1.,-2.,-1.};
-static  float   lkup_4[16] = {0.,1.,2.,3.,4.,5.,6.,7.,-8.,-7.,-6.,-5.,-4.,-3.,
+#if FALSE
+static  short   lkup_1[2]={1.,-1.};
+static  short   lkup_2[4] = {0.,1.,-2.,-1.};
+static  short   lkup_4[16] = {0.,1.,2.,3.,4.,5.,6.,7.,-8.,-7.,-6.,-5.,-4.,-3.,
 			      -2.,-1.};
+#endif
+static  short   lkup_1[2]={1,-1};
+static  short   lkup_2[4] = {0,1,-2,-1};
+static  short   lkup_4[16] = {0,1,2,3,4,5,6,7,-8,-7,-6,-5,-4,-3,
+			      -2,-1};
 	short   *inPtrI1,*inPtrQ1;
 	short   *inPtrI2,*inPtrQ2;
     unsigned short swi1,swq1;
     unsigned short swi2,swq2;
 	short swi1S,swq1S;
     short swi2S,swq2S;
-	float   *outPtrI1,*outPtrQ1;
-	float   *outPtrI2,*outPtrQ2;
+	short   *outPtrI1,*outPtrQ1;
+	short   *outPtrI2,*outPtrQ2;
 	int  	instep;		/* number shorts between inputs 1 dig*/
 	int  	outStep;	/* number double between outputs 1 dig*/
 	int     i;
@@ -75,17 +79,17 @@ static  float   lkup_4[16] = {0.,1.,2.,3.,4.,5.,6.,7.,-8.,-7.,-6.,-5.,-4.,-3.,
 */
 	switch(numFifos){
 	      case 1:
- 	           if ((outPtr1==(float  *)NULL)) goto errout;
+ 	           if ((outPtr1==(short  *)NULL)) goto errout;
 	           if (iqSepReg) {
- 	              if (outPtr2==(float  *)NULL)goto errout;
+ 	              if (outPtr2==(short  *)NULL)goto errout;
 		   }
 	           break;
 	      case 2:
- 	             if ((outPtr1==(float  *)NULL) || 
- 	                 (outPtr2==(float  *)NULL)) goto errout;
+ 	             if ((outPtr1==(short  *)NULL) || 
+ 	                 (outPtr2==(short  *)NULL)) goto errout;
 	             if (iqSepReg) {
- 	                if ((outPtr3==(float  *)NULL) || 
- 	                    (outPtr4==(float  *)NULL)) goto errout;
+ 	                if ((outPtr3==(short  *)NULL) || 
+ 	                    (outPtr4==(short  *)NULL)) goto errout;
 		     }
 		     break;
 	      default:
@@ -128,18 +132,18 @@ static  float   lkup_4[16] = {0.,1.,2.,3.,4.,5.,6.,7.,-8.,-7.,-6.,-5.,-4.,-3.,
                 swq1=bswap_16(*inPtrQ1);
                 unpri_1(swi1,outPtrI1,outStep);
                 unpri_1(swq1,outPtrQ1,outStep);
-		  		inPtrI1+=instep;
-		  		inPtrQ1+=instep;	
+		  inPtrI1+=instep;
+		  inPtrQ1+=instep;	
 	        }
 	        break;
 	      case 2:
 	        for (i=0;i<numwrds;i++){
-          		swi1=bswap_16(*inPtrI1);
-          		swq1=bswap_16(*inPtrQ1);
-          		unpri_2(swi1,outPtrI1,outStep);
-          		unpri_2(swq1,outPtrQ1,outStep);
-		  		inPtrI1+=instep;
-		  		inPtrQ1+=instep;	
+          swi1=bswap_16(*inPtrI1);
+          swq1=bswap_16(*inPtrQ1);
+          unpri_2(swi1,outPtrI1,outStep);
+          unpri_2(swq1,outPtrQ1,outStep);
+		  inPtrI1+=instep;
+		  inPtrQ1+=instep;	
 	        }
 	        break;
 	      case 4:
@@ -205,8 +209,8 @@ static  float   lkup_4[16] = {0.,1.,2.,3.,4.,5.,6.,7.,-8.,-7.,-6.,-5.,-4.,-3.,
                   swi2=bswap_16(*inPtrI2);
                   swq2=bswap_16(*inPtrQ2);
 				  unpri_1(swi1,outPtrI1,outStep);
-            	  unpri_1(swq1,outPtrQ1,outStep);
-            	  unpri_1(swi2,outPtrI2,outStep);
+                  unpri_1(swq1,outPtrQ1,outStep);
+                  unpri_1(swi2,outPtrI2,outStep);
                   unpri_1(swq2,outPtrQ2,outStep);
                   inPtrI1+=instep;
                   inPtrQ1+=instep;
@@ -240,7 +244,6 @@ static  float   lkup_4[16] = {0.,1.,2.,3.,4.,5.,6.,7.,-8.,-7.,-6.,-5.,-4.,-3.,
                   unpri_4(swq1,outPtrQ1,outStep);
                   unpri_4(swi2,outPtrI2,outStep);
                   unpri_4(swq2,outPtrQ2,outStep);
-
                   inPtrI1+=instep;
                   inPtrQ1+=instep;
                   inPtrI2+=instep;
@@ -282,6 +285,6 @@ static  float   lkup_4[16] = {0.,1.,2.,3.,4.,5.,6.,7.,-8.,-7.,-6.,-5.,-4.,-3.,
 	  }
 	  break;
 	}
-	return(0);
-errout: return(-1);
+	return(OK);
+errout: return(ERROR);
 } 
