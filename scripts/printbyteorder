@@ -1,0 +1,28 @@
+#!/usr/bin/perl 
+use Config;
+use Getopt::Std;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+$VERSION = "1.0";
+
+our ($opt_h);
+
+getopts("h");
+
+if ($opt_h) {
+	HELP_MESSAGE();
+	exit;
+}
+
+
+sub HELP_MESSAGE {
+	print STDERR "Usage: printbyteorder [args]
+will print all of the args separated by spaces and then the byteorder as perl knows it
+";
+}
+
+map  { print "$_ " } @ARGV;
+
+print "$Config{byteorder}\n";
+
+

@@ -17,6 +17,7 @@ FORCE:
 scripts: FORCE
 	chmod u+w scripts/*
 	cp scripts/*.sc $(GLOBDIR)
+	cp scripts/printbyteorder $(GLOBDIR)
 	cp scripts/*.awk $(GLOBDIR)
 
 libunpack:     unp_pfs_pc_edt.c; $(CC) $(CFLAGS) -c unp_pfs_pc_edt.c -o libunpack.o

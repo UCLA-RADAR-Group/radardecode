@@ -53,7 +53,7 @@
 #
 #set verbose
 #
-set stem = "/pkg/aosoft/fedora4/x86_64/bin"
+#set stem = "/pkg/aosoft/fedora4/x86_64/bin"
 set parms=($*)              
 if ( $#parms == 0 || $#parms > 3 ) then
   echo "Usage: drv_cw.sc <control file> fstart fend"
@@ -164,7 +164,7 @@ while ( $fifoToUse <= $numpol )
   set scannum = $fstart
   while ( $scannum <= $fend )
     stripVme -h -o $scannum -n 1 -g "$firstrec $lastrec" < $inpfile |\
-    unpriVtoi4 -b $bits -i $numpol -f $fifoToUse -d 3 |\
+    unpriV -b $bits -i $numpol -f $fifoToUse -d 3 |\
     cat -s tmp$$ - |\
     convdatatype -q -i i4 -o f4 |\
     zerofill $nofillflag -b 8 -i $fftlen -o $fftlen |\
