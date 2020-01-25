@@ -3,6 +3,8 @@
 /*	timervalue  ... 		    			            */
 /****************************************************************************/
 #include <sys/time.h>
+#include    <utilLib.h>
+
 double timervalue(void)
 {
 /*	get the current value of the interval timer
