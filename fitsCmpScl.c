@@ -1,11 +1,11 @@
 #include	<stdio.h>
+#include	<utilLib.h>
 
 #define MINSHORT -32768.
 #define MAXSHORT  32767.
 #define MININT   -2147483648.
 #define MAXINT    2147483647.
-#define ERROR -1
-#define OK     0
+
 
 int	fitsCmpScl(
 		char *outdata,	/*"i","s".. int,short output data*/
