@@ -1,7 +1,7 @@
 #include	<stdio.h>
 #include	<unistd.h>
-#define OK 0
-#define ERROR -1  
+#include <utilLib.h>
+
 /*
  *	output fits header
  *	if ok, return 0
