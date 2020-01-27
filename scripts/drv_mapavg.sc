@@ -1,4 +1,3 @@
-#!/bin/tcsh
 #
 #	drv_mapavg.sc   firstfile numfiles filesavg filenumout {maps,map}
 #	..   
@@ -16,19 +15,19 @@
 # 2012feb17 added auto-fits MCP/PT
 #
 #set verbose
-#unset noclobber #todospd leave it?
-#unalias rm
-set basefile=`ex.awk $DRVSB fbase`
-set sufin=`ex.awk $DRVSB sufspc`
-set rngbins=`ex.awk $DRVSB numbins`
-set frqbins=`ex.awk $DRVSB spcfftkeep`
+unset noclobber
+unalias rm
+set basefile=`keyval.sc< $DRVSB fbase`
+set sufin=`keyval.sc< $DRVSB sufspc`
+set rngbins=`keyval.sc< $DRVSB numbins`
+set frqbins=`keyval.sc< $DRVSB spcfftkeep`
 @   pntsmap= ${rngbins} * ${frqbins}
 set tmpfile="${basefile}_tmp$$"
 set parms=($*)              
 if ( $#parms == 4 || $5 == "maps") then
-   set sufin=`ex.awk $DRVSB sufscl`
+   set sufin=`keyval.sc< $DRVSB sufscl`
 else if ( $5 == "map") then
-   set sufin=`ex.awk $DRVSB sufspc`
+   set sufin=`keyval.sc< $DRVSB sufspc`
 else
   echo "Usage:drv_mapavg.sc 1stfile numfile filestoavg 1stfilenumout (maps/map)"
   exit(-1)

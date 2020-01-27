@@ -38,15 +38,15 @@
 #define PRGID      "scaletosigma"
 #define TRUE       1
 #define FALSE      0
+#ifndef MAX
 #define MAX(a,b)  ((a>b)?a:b)
+#endif
+#ifndef MIN
 #define MIN(a,b)  ((a<b)?a:b)
+#endif
 
 void    processargs(int argc,char **argv,int *numrows,int *numcols,
 				int *firstcol,int *lastcol,int *firstRow,int *lastRow,char **logfile);
-
-/* revision control variable */
-static char const rcsid[] = 
-"$Id$";
 
 int main(int argc,char **argv)
 {
@@ -195,7 +195,7 @@ char    **logfile)
         char  *myoptions = "r:c:f:l:t:F:L:"; /* options to search for. :--> needs
                                             an argument*/
 char *USAGE =
-"Usage: scaletosigma -r numrows -c numcols -f firstcol -l lastcol \n -F firstRow -L lastRow  -t tmpfile";
+"Usage: scaletosigma -r numrows -c numcols -f firstcol -l lastcol \n                    -F firstRow -L lastRow  -t tmpfile";
 
         opterr = 0;                             /* turn off there message*/
 /* 
@@ -234,7 +234,6 @@ char *USAGE =
  *      here if error occured
 */
 errout: ;
-	fprintf(stderr,"%s\n",rcsid);
         fprintf(stderr,"%s\n",USAGE);
         exit(1);
 }

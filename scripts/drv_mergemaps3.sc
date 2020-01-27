@@ -5,7 +5,7 @@
 #   will take a subset of range, freq.. and will allow an offset in freq
 #   from the center of the map.
 #	
-#   [-F] flip top to bottom
+#   [-F] flip top to bottom. (needs to be first arg if used)
 #   [-f fitsfilename] make a fits file rather than a float output map
 #	firstfile... $infilexx 
 #   numfiles ... to read in
@@ -17,13 +17,14 @@
 # 27may99 .. removed zoom, revmoed -r, added -f make fits file
 #	
 # set verbose
-#unset noclobber #todospd ?
+unset noclobber
 unalias rm
 unalias mv
 set sufout="img"
 set Flip=""
 if ( "$1" == "-F") then
     set Flip=" -f "
+	shift;
 endif
 set makFits=0
 if ( "$1" == "-f") then
@@ -32,10 +33,10 @@ if ( "$1" == "-f") then
 	shift;shift
 endif
 set maxhorpix=1100	
-set basefile=`ex.awk $DRVSB fbase`
-set sufin=`ex.awk $DRVSB sufscl`
-set rngbins=`ex.awk $DRVSB numbins`
-set frqbins=`ex.awk $DRVSB spcfftkeep`
+set basefile=`keyval.sc< $DRVSB fbase`
+set sufin=`keyval.sc< $DRVSB sufscl`
+set rngbins=`keyval.sc< $DRVSB numbins`
+set frqbins=`keyval.sc< $DRVSB spcfftkeep`
 set parms=($*)              
 if (( $#parms != 6) && ($#parms != 7) ) then
  echo "Usage: drv_mergemaps3.sc [-f fitsname] 1stfile nfiles freqOffset newfrqlen newrnglen  mapsperrow
@@ -95,7 +96,7 @@ end
 if ($makFits == 1) then
 @ bigcol= $mapsinrow * ( $newfrqlen + 1 )
 @ bigrow= ( ( $numfiles + $mapsinrow - 1 ) / $mapsinrow ) * ( $newrnglen + 1 )
-	makefits $Flip -c $bigcol -r $bigrow < $outfile > $fitsName
+    makefits $Flip -c $bigcol -r $bigrow < $outfile > $fitsName
 	rm $outfile
     echo "fits file :$fitsName rng:$newrnglen frq:$newfrqlen"
 else 

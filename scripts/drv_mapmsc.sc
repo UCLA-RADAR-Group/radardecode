@@ -1,4 +1,4 @@
-#!/bin/csh
+#!/bin/csh -f
 #                       1      2        3      4          5             6   7
 #drv_mapmsc.sc {opts} file1 numfiles toavg map/row 
 #                     {newRowLen} {newColLen}{colOff}
@@ -16,12 +16,12 @@
 #   colOffset column offset for maps
 # ----------------
 #set verbose
-#todospd unset noclobber ?
-set basefile=`ex.awk $DRVSB fbase`
-set    sufin=`ex.awk $DRVSB sufscl`
-set  rngbins=`ex.awk $DRVSB numbins`
-set  frqbins=`ex.awk $DRVSB spcfftkeep`
-set  smpperbaud=`ex.awk $DRVSB smpperbaud`
+unset noclobber
+set basefile=`keyval.sc< $DRVSB fbase`
+set    sufin=`keyval.sc< $DRVSB sufscl`
+set  rngbins=`keyval.sc< $DRVSB numbins`
+set  frqbins=`keyval.sc< $DRVSB spcfftkeep`
+set  smpperbaud=`keyval.sc< $DRVSB smpperbaud`
 set  makemaps=0
 set  newRowLen=$frqbins
 set  newColLen=$rngbins
@@ -29,13 +29,14 @@ set  colOffset=0
 set  torotate=0
 set row1scale=1
 set row2scale=$rngbins
+set col1scale=1
+set col2scale=$frqbins
 set  hdr=$basefile.hdrmsc 
 set usage="Usage drv_mapmsc.sc {-s col1 col2 -S row1 row2} file1 numFiles toAvg \n                                mapsPerrow {newRowLen} {newColLen} {colOffset} "
 #
 #	should we rescale the the maps files ??
 #
-touch $hdr #todospd remove this?
-echo "drv_mapmsc.sc START       :`date`" >>  $hdr
+echo "drv_mapmsc.sc START       :`date`" >>!  $hdr
 set doneopt=0
 while ( $doneopt == 0 ) 
 	if ( "$1" == "-s") then
@@ -87,11 +88,9 @@ set  bname=`basename $basefile`
 set  dname=`dirname $basefile`
 
 if ( ! -e Fits ) then
-        mkdir Fits
+    mkdir Fits
 endif
 
-#
-# setting name of fits file
 #
 #if ( $numfiles == 1 ) then
 #	set  fitsName=$dname/Fits/f${file1}.fit
@@ -105,7 +104,7 @@ if ( $makemaps != 0 ) then
 	drv_scale.sc $file1 $numfiles $col1scale $col2scale $row1scale $row2scale
 endif
 #
-# if we avg maps.. store averages in $tempavg$$.n (no if)
+# if we avg maps.. store averages in $tempavg$$.n
 #
 #if ( $filesToAvg > 1 ) then
 	set fileNumOut=900
@@ -128,13 +127,13 @@ drv_mergemaps3.sc -f $fitsName $fileNumOut $mapsInMos $colOffset $newRowLen $new
 # log in $fbase.mschdr what we did
 #
 #echo "headerfile:$hdr"
-echo "   basefile               : $basefile"         >> $hdr
-echo "   fits filename          : $fitsName"        >> $hdr
-echo "   1st file, numfiles     : $file1 $numfiles" >> $hdr
-echo "   orig frq,range bins    : $frqbins $rngbins">> $hdr
-echo "   kept frq,range bins    : $newRowLen $newColLen">> $hdr
-echo "   frq bin offset,smp/baud: $colOffset $smpperbaud">> $hdr
-echo "   rotate range bins      : $torotate" >> $hdr
-echo "   maps avged             : $filesToAvg " >> $hdr
-echo "   maps per row           : $mapsPerRow" >> $hdr
-echo "drv_mapmsc.sc END         :" >>  $hdr
+echo "   basefile               : $basefile"         >>! $hdr
+echo "   fits filename          : $fitsName"        >>! $hdr
+echo "   1st file, numfiles     : $file1 $numfiles" >>! $hdr
+echo "   orig frq,range bins    : $frqbins $rngbins">>! $hdr
+echo "   kept frq,range bins    : $newRowLen $newColLen">>! $hdr
+echo "   frq bin offset,smp/baud: $colOffset $smpperbaud">>! $hdr
+echo "   rotate range bins      : $torotate" >>! $hdr
+echo "   maps avged             : $filesToAvg " >>! $hdr
+echo "   maps per row           : $mapsPerRow" >>! $hdr
+echo "drv_mapmsc.sc END         :" >>!  $hdr
