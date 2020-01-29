@@ -2,22 +2,19 @@
 #
 # key                    value            programs that use it
 #
-inpfile     /share/olda/datafile.16aug98.sbastcw.1
-fbase  		/share/olda/sband/Ast/aug16cw64k
+inpfile      datafile.26jun14.r2867.1
+fbase  	     2010NY65.2014Jun26.p0169Hz.cw          # target.mondd.resHz.cw
 #
-bits    	12	
-#				
-numpol     	2		  
+bits    	12
+
+numpol     	2
 #				     
-spcfftlen  	65536
+fftlen  	737500
 #
-#  first/last rec of each scan to process
-#
-firstrec    1
-lastrec     2000000000
+nfftave         1     #  Need (fftlen * nfftave) = (# of samples per hop)
 #
 #	suffixes for programs..
 #	see end of README for who uses what
 #
 cwsufspc		spc		     
-cwsufcat		spcall    
+cwsufcat		spcall  
