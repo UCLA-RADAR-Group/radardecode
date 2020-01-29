@@ -1,10 +1,11 @@
 #include        <stdio.h>
+#include	    <stdlib.h>
 #include        <fcntl.h>
 #include        <malloc.h>
 #include	 	<string.h>
-#include		<riLib.h>
+#include        <fftw3.h>
 #include		<philLib.h>
-#include		<unpack.h>
+#include 		"utilLib.h"
 /*
  *      decode an input stream of radar data.                    
  *      
@@ -19,15 +20,17 @@
  *      -o  offset to add to input data
  *      -t print times
  *      -d debug... clip to +/- .5 input data must also set -o .5
+ *      -g aopnc,dsnpnc, barker   pnc Generator type ao or dsn or barker code.
+ *         def aopnc. min match: ao,dsn,bar.
  *		-s 2   .. samples per baud 1,2,3 ..etc
  *      -p  numpol polToUse:f
- *      -a  codeProgram to use
+ *gone  -a  codeProgram to use.. now uses internal routine
  *
  *      3aug99, -u     .. input data already unpacked as floats.
  *  			  in 16 bit word.. i,q
  * 			    replace by -m unpacked
  *      -r remove Dc 
- *      -m machine..unpacked,cbr,ri .. (for cbr should set numpol,poltouse
+ *      -m machine..unpacked,cbr,ri,pfs,pdev .. (for cbr should set numpol,poltouse
  *      below not implemented  yet...
  *      -f freqShift .. frequency bins to shift. positive is to higher freq.
  *                      1 bin = 1/(baud*xformlen)
@@ -103,6 +106,9 @@
  *				generate the code to decode. It should accept the following
  *              args.. prgname -c codelen -s small value -b bigvalue
  *  01nov99  .. fftwAo now had not inplace option.
+ *  16aug02  .. codeProgName was not being passed to input_code routine..
+ *				fixed to barker codes will now work.
+ * see svn log radardecode.c for rest of history.
  * history end:
 */
 /*
@@ -115,10 +121,12 @@
 #define  K  1024 
 #define  TRUE  1 
 #define  FALSE 0
+#ifndef MIN
 #define  MIN(a,b)  ((a)<(b))?(a):(b)
+#endif
 /*   prgname_pncode used by sun to generate codes,
 */
-#define  PRGNAME_PNCODE "/home/margot/bin/comppncode" 
+//#define  PRGNAME_PNCODE "/usr/local/bin/comppncode" 
 #define  prtime(loop,time,str) \
               fprintf(stderr,"loop:%d %f secs %s\n",loop,time,str)
 /***************************************************************************
@@ -189,18 +197,20 @@
             (pout)+=4;
 /*
  * 	codes for type of input.. used in bufinfo inputType
- * 1 ri data 1 pol
+ * 1 ri data 1 pol ... other pol removed prior to radardecode by scripts
  * 2 unpacked floats
- * 3 cbr data
- * 4 pfs data
- * 5 bytes
+ * 3 cbr data. keep pol number 1
+ * 4 pfs data 2,4,8 bits, 1 or two pols input
+ * 5 byte data 1 byte/sample. 1 or 2 pols i,q entered
 */
 
 #define INPTYPE_RI	        1
 #define INPTYPE_UNPACKED	2
 #define INPTYPE_CBR     	3
-#define INPTYPE_PFS     	4
-#define INPTYPE_BYTES     	5
+#define INPTYPE_PFS         4
+#define INPTYPE_BYTES       5
+#define INPTYPE_PDEV        6
+
 
 
 /*    typedefs 	*/
@@ -226,25 +236,26 @@ typedef struct {
 int     allocate_buffers(BUF_INFO *pbufI,int fftlen,int points_to_save,int bits);
 int     getdata(BUF_INFO *pbufI,int bits,float *buf,int points,
 				float offset,int dbgClip,int removeDc);
-int     input_code(int codelen,int samplesPerBaud,int lenfft,float *code_buf,
-				   float scalefactor, char *codeProgName);
+int     input_code(int codelen,int samplesPerBaud,int lenfft,
+				   fftwf_plan fftwPlan,int codetype,float *code_buf,
+					float scalefactor);
 void    processargs(int argc,char **argv,int *codelen,int *lenfft,
 				int *numcodes_req,int *quiet,float *offset,int *bits,
 				int *timeout,int *samplesPerBaud,int *removeDc,int *inputType,
 				float *pfreqShift,int *debug_clip,int *numpol,int *polToUse,
-				char *codeProgName);
+				int *codetype);
 
 void unpcbr (int bytesInp,int numpol,int polToUse,unsigned char *packedBuf,
 				 float *punpackedBuf);
-void unppfs (int bytesInp,int bits,int numpol,int polToUse,unsigned char *packedBuf,
-				 float *punpackedBuf);
-void unpbytes (int bytesInp,unsigned char *packedBuf,float *punpackedBuf);
-STATUS  unpriV_i4(int numwrds,int numFifos,int bits,int IQsepReg,char *inPtr,
-				 int *outPtr1,int *outPtr2, int *outPtr3,int *outPtr4);
 
-/*
-void four1(float *dat,int lenxform,int direction);
-*/
+void unppfs(int bytesInp,int bits,int numpol,int polToUse,unsigned char *packedBuf,
+            float *punpackedBuf);
+void unppdev(int bytesInp,int bits,int numpol,int polToUse,unsigned char *packedBuf,
+            float *punpackedBuf);
+void unpbytes(int bytesInp,unsigned char *packedBuf,float *punpackedBuf);
+int  unpriV_i4(int numwrds,int numFifos,int bits,int IQsepReg,char *inPtr,
+                  int *outPtr1,int *outPtr2, int *outPtr3,int *outPtr4);
+
 
 float   lkupCbrF[4] ={0.f,1.f,-2.f,-1.f}; /* value for cbr unpack*/
 int     one = {1};
@@ -253,14 +264,10 @@ int     two ={2};
 int     bytes_per_cmplx_point = {8};
 /*  
  *      globals for get data.. double buffering, etc
+ *
 */
-char *rcp; /* char buffer for char unpacking of PFS data */
 
-/* revision control variable */
-static char const rcsid[] = 
-"$Id$";
-
-int main(int argc,char **argv) 
+int main(int argc,char **argv)
 { 
 
         int     codelen;                        /* code length requested*/
@@ -287,9 +294,9 @@ int main(int argc,char **argv)
         int     quiet;                          /* run quietly*/
         int     bits;                           /* for data*/
 		int		samplesPerBaud;			/* 1,2,...*/
+		int		codetype;					// 1 ao, 2 dsn 3 barker
 	    int	    removeDc; 	 /* true-->remove mean i,q after input 
 									do this  xformlen at a time*/
-		char	codeProgName[132];
 /*
  *      buffers
  *      
@@ -324,6 +331,7 @@ int main(int argc,char **argv)
         float   *fft_buf_newdata;               /* after savebuf data*/
         float   *fft_buf_nextsave;              /* to save for next time*/
         int     codesdecoded;                   /* actually done*/
+		fftwf_plan fftwPlan;
 
 /*      do some inits to get rid of warning messages.*/
         ttotal=tcmplxmul=tfftr=tfftf=tread=twrite=tmovesavein=tstart=time1=0.;
@@ -337,6 +345,7 @@ int main(int argc,char **argv)
         offset=0.;                              /* for data*/
 		outrecs=0;
         bits=12;
+		codetype=CODETYPE_PNC_SITE_AO;
         dotime=FALSE;
         debug_clip=FALSE;
 		freqShift=0.;
@@ -352,7 +361,7 @@ int main(int argc,char **argv)
         processargs(argc,argv,&codelen,&lenfft,&numcodes_req,&quiet,&offset,
                               &bits,&dotime,&samplesPerBaud,&removeDc,
 							  &bufI.inputType,&freqShift,&debug_clip,
-							  &bufI.numPol,&bufI.polToUse,codeProgName);
+							  &bufI.numPol,&bufI.polToUse,&codetype);
 
 	    codelenUsed=codelen*samplesPerBaud;
         numffts_req = (((float)numcodes_req)*codelenUsed)/
@@ -370,6 +379,15 @@ int main(int argc,char **argv)
         fft_buf_newdata = &(bufI.fft[points_to_save*2]);/* *2 since cmplx*/
         fft_buf_nextsave= &(bufI.fft[(lenfft-points_to_save)*2]);
 /*
+ * fftw plan initialization
+ * note we need the buffer allocated for fftmeasure
+ * in place forward xform
+*/
+         xformdir=-1;
+		 fftwPlan=fftwf_plan_dft_1d(lenfft,
+				(fftwf_complex*)bufI.fft,
+				(fftwf_complex*)bufI.fft,xformdir,FFTW_MEASURE);
+/*
  *      input code, zero fill and transform,      
  *      we do 3 ffts of same direction. need to scale by two times the 
  *      xform scaling.
@@ -378,7 +396,8 @@ int main(int argc,char **argv)
 */
         scalefactor = 1./((float)lenfft);
         
-        if (!input_code(codelen,samplesPerBaud,lenfft,bufI.code,scalefactor,codeProgName))
+        if (!input_code(codelen,samplesPerBaud,lenfft,fftwPlan,codetype,bufI.code,
+				scalefactor))
 			exit(-1);   
 /*
  *      read in 1st save buf points into save buf
@@ -445,12 +464,9 @@ int main(int argc,char **argv)
 /*
  *      now go to the frequency domain 
 */
-            xformdir=-1;
             if (dotime) time1=timervalue();     
-			fftwAo(bufI.fft,NULL,lenfft,xformdir,1);
-/* 
-            four1(bufI.fft-1,lenfft,xformdir);
-*/
+			fftwf_execute_dft(fftwPlan,(fftwf_complex*)bufI.fft,
+			                           (fftwf_complex*)bufI.fft);
             if (dotime) tfftf=time1-timervalue();
 /*
  *      if x=data, h=code.. we want the correlation:
@@ -475,10 +491,8 @@ int main(int argc,char **argv)
  *      now do the inverse xform
 */
             if (dotime)time1=timervalue();      
-			fftwAo(bufI.fft,NULL,lenfft,xformdir,1);
-/*
-            four1(bufI.fft-1,lenfft,xformdir);
-*/
+			fftwf_execute_dft(fftwPlan,(fftwf_complex*)bufI.fft,
+			                           (fftwf_complex*)bufI.fft);
             if (dotime) tfftr=time1-timervalue();
 /*
  *      write out the valid data points
@@ -563,28 +577,36 @@ int     allocate_buffers
         }
 /*
  *      allocate input buffer for packed data
+ *      Note:1. for ri we've alread removed the other pol
+ *              before calling radardecode
+ *           2.  for cbr,pfs,byte,pdev  the 2nd pol is in the input stream.
+ *           
 */
 		switch (pbufI->inputType) {
 			case INPTYPE_RI:
-        		samplesperword=16/bits/pbufI->numPol;          /* i or q*/
+        		samplesperword=16/bits;                     /* i or q*/
 			    break;
 			case INPTYPE_CBR:
 			    /*  kludge up so multiple of 4 bytes like ri data */
         		samplesperword=(pbufI->numPol == 2)?4:8;/*in 1 4 byte word*/
 			    break;
-			case INPTYPE_PFS:
-			    /*  kludge up so multiple of 4 bytes like ri data */
-        		samplesperword=16/bits/pbufI->numPol;/*in 1 4 byte word*/
-			    break;
-			case INPTYPE_BYTES:
-        		samplesperword=2;/*in 1 4 byte word*/
-			    break;
+		    case INPTYPE_PFS:
+                /*  kludge up so multiple of 4 bytes like ri data */
+                samplesperword=16/bits/pbufI->numPol;/*in 1 4 byte word*/
+                break;
+            case INPTYPE_BYTES:
+                samplesperword=2;/*in 1 4 byte word*/
+                break;
+		    case INPTYPE_PDEV:
+                /*  kludge up so multiple of 4 bytes like ri data */
+                samplesperword=16/bits/pbufI->numPol;/*in 1 4 byte word*/
+                break;
 			default:
-        		samplesperword=1; 			/* unpacked data */
+        		samplesperword=1; 			/* unpacked data.. */
 		}
         wordsneeded= (fftlen + samplesperword -1)/samplesperword; /*round up*/
 /* 
- *      if two channels input, multiply by two here
+ *      if two channels input, multiply by two here 22jan14. comment wrong, 2pol done above..
 */
         pbufI->lenInpPackedB= wordsneeded*4;        /* 4 bytes/ word*/
        pbufI->inpPacked=(unsigned char *)(calloc((unsigned)pbufI->lenInpPackedB,
@@ -604,17 +626,6 @@ int     allocate_buffers
             perror("radardecode: Allocating input_unpacked buffer");
             return(FALSE);
         }
-
-	/* jlm allocate buffer for PFS unpacked char data */
-	if (pbufI->inputType == INPTYPE_PFS)
-	  {
-	    rcp = (char *) malloc(pbufI->lenInpUnpackedF4 * sizeof(char));
-	    if (rcp == NULL){
-	      perror("radardecode: Allocating PFS char buffer");
-	      return(FALSE);
-	    }
-	  }
-
         return(TRUE);
 }
 /******************************************************************************/
@@ -668,32 +679,34 @@ int  getdata
 				  if (bytes_inp <= 0) {           /* eof or error. stop now*/
                     return(bytes_inp);
                   }
-				  /* ri data.  will FAIL with dual polarization RI data */
-				  /* must eliminate one polarization in main_decode.sc */
+
+				  /* ri data */
+
 				  if (pbufI->inputType == INPTYPE_RI) {
                      words_inp= bytes_inp/4;          /* make sure full words*/
-
                      unpriV_f4(words_inp,1,bits,FALSE,(char*)pbufI->inpPacked,
 					     pbufI->inpUnpacked,NULL,NULL,NULL);
-                     pbufI->gdpoints_unused= words_inp*(16/bits);
-		     /* we'd really like something that can handle dual polarization like
-		     unpriV_f4(words_inp,pbufI->numPol,pbufI->polToUse,bits,FALSE,(char*)pbufI->inpPacked,
-			       pbufI->inpUnpacked,NULL,NULL,NULL);
-                     pbufI->gdpoints_unused= bytes_inp*(4/pbufI->numPol/bits);
-		     */
-				  /* cbr data, always 2 bits */
+                     pbufI->gdpoints_unused= words_inp*(16/bits);/*complex*/
+
+				  /* cbr data */
 				  } else if (pbufI->inputType == INPTYPE_CBR) {
 					 unpcbr(bytes_inp,pbufI->numPol,pbufI->polToUse,
 							pbufI->inpPacked,pbufI->inpUnpacked);
                      pbufI->gdpoints_unused= bytes_inp*(2/pbufI->numPol);
 				  /* pfs data */
-				  } else if (pbufI->inputType == INPTYPE_PFS) {
-					 unppfs(bytes_inp,bits,pbufI->numPol,pbufI->polToUse,
-							pbufI->inpPacked,pbufI->inpUnpacked);
-                     pbufI->gdpoints_unused= bytes_inp*(4/pbufI->numPol/bits);
-				  /* bytes */
-				  } else if (pbufI->inputType == INPTYPE_BYTES) {
-					 unpbytes(bytes_inp,pbufI->inpPacked,pbufI->inpUnpacked);
+                  } else if (pbufI->inputType == INPTYPE_PFS) {
+                     unppfs(bytes_inp,bits,pbufI->numPol,pbufI->polToUse,
+                            pbufI->inpPacked,pbufI->inpUnpacked);
+                     pbufI->gdpoints_unused= (int)(bytes_inp*(4./pbufI->numPol/bits) + .4);
+				     /* pdev data */
+                  } else if (pbufI->inputType == INPTYPE_PDEV) {
+                     unppdev(bytes_inp,bits,pbufI->numPol,pbufI->polToUse,
+                            pbufI->inpPacked,pbufI->inpUnpacked);
+                     pbufI->gdpoints_unused= (int)(bytes_inp*(4./pbufI->numPol/bits) + .4);
+
+                  /* bytes */
+                  } else if (pbufI->inputType == INPTYPE_BYTES) {
+                     unpbytes(bytes_inp,pbufI->inpPacked,pbufI->inpUnpacked);
                      pbufI->gdpoints_unused= bytes_inp/2;
 				  } else {
 					fprintf(stderr,"inputType:%d unkown type.. getdata\n",
@@ -751,19 +764,16 @@ int     input_code
  	 int     codelen,                        /* len of code requested*/
 	 int	 samplesPerBaud,			    /* sampled*/
 	 int     lenfft,                        /* len of xform to use*/
-	 float   *code_buf,                      /* put transformed code here*/
-	 float   scalefactor,                     /* for 1/n of xforms*/
-	 char *codeProgName			/* code program to use */
+	 fftwf_plan fftwPlan,					/* to xfrom code*/
+	 int	 codetype,					    /* 1 ao, 2 dsn,3 barker */
+	 float   *code_buf,                     /* put transformed code here*/
+	 float   scalefactor                      /* for 1/n of xforms*/
 	)
 	  
 {
-        FILE    *pstr;                  /* hold stream ptr for pipe*/
-        char    pncommand[80];          /* build command for pncode prog*/
         int     smallvalue,bigvalue;    /* for the code*/
         int     *inpbuf;                /* hold code from program (integer)*/
         int     i,j,k;
-        int     inpwords;
-        int     xformdir;               /* for fft*/
 		int		codelenUsed;			/* codelen*samplesperbaud*/
 /*
  *      allocate buffer for read (we get integer data from program
@@ -775,26 +785,25 @@ int     input_code
             return(FALSE);
         }
 /*
- *      startup filter that will create the code
+ *      routine to compute code
 */
         smallvalue = -1;                /* for code*/
         bigvalue   = 1;                 /* for code*/
-        sprintf(pncommand,"%s -c %d -s %d -b %d",codeProgName,
-             codelen,smallvalue,bigvalue);
-         if( (pstr=popen(pncommand,"r")) == NULL){
-      fprintf(stderr,"Can't start pncode generating program: %s\n",
-                      codeProgName);
-             free((char *)inpbuf);              /* free the space*/
-             return(FALSE);
-         }
-        inpwords=fread((char *)inpbuf,sizeof(int),codelen,pstr);
-        if (inpwords != codelen) {
-           fprintf(stderr,"Couldn't readin entire pncode\n");
-           perror("radardecode");
-           free((char *)inpbuf);
-           pclose(pstr);                        /* close the stream*/
-           return(FALSE);
-        }
+		if (codetype == CODETYPE_BARKER) {
+			if (compbarkercode(codelen,smallvalue,bigvalue,inpbuf) != 0){
+			fprintf(stderr,"Error calling compbarkercode. codelen %d wrong?",
+				codelen);
+            free((char *)inpbuf);              /* free the space*/
+			return(FALSE);
+         	}
+		} else {
+			if (comppncode(codelen,codetype,smallvalue,bigvalue,inpbuf) != 0){
+			fprintf(stderr,"Error calling comppncode. codelen %d wrong?",
+				codelen);
+            free((char *)inpbuf);              /* free the space*/
+			return(FALSE);
+         	}
+		}
 /*
  *      now move integer numbers to real array, expand if 
  *      if samples/baud > 1 duplicate the values
@@ -810,20 +819,14 @@ int     input_code
              code_buf[i]=0.;                    /* real*/
              code_buf[i+1]=0.;                  /* imag*/
         }
-        xformdir=-1;
-        fftwAo(code_buf,NULL,lenfft,xformdir,1);             /* do the xform*/
-#if FALSE
-        four1(code_buf-1,lenfft,xformdir);             /* do the xform*/
-#endif
+		fftwf_execute_dft(fftwPlan,(fftwf_complex*)code_buf,
+		                           (fftwf_complex*)code_buf);
         for (i=0;i<lenfft*2;i++){               /* now scale the results*/
             code_buf[i]*=scalefactor;
         }
 /*
- *      close pipe, free memory
+ *      free memory
 */
-        if (pclose(pstr) == -1){
-            fprintf(stderr,"Error closing pncomp stream\n");
-        }
         free((char *)inpbuf);
         return(TRUE);
 }
@@ -847,8 +850,8 @@ void    processargs
 	 float   *freqShift,
 	 int     *debug_clip,
 	 int	 *pnumPol,
-	 int	 *ppolToUse, 
-	 char    *codeProgName
+	 int	 *ppolToUse,
+	 int     *codetype
 	)
 {
 /*
@@ -872,24 +875,18 @@ void    processargs
         char c;                         /* Option letter returned by getopt*/
 
         char *USAGE =
-"Usage: radardecode -b bits -c codelen -l lenfft -n numcodes -o offset -q -t -d \
- -s smp/Baud -r (removeDc) -m {ri cbr pfs floats bytes} \
- -a codeProgName (-f freqShiftBins notyet)";
+"Usage:radardecode -b bits -c codelen -l lenfft -n numcodes -o offset -q -t -d\
+                  -s smp/Baud -r (removeDc) -m {ri cbr pfs floatsOrunpacked  bytes} -g {ao dsn barker} \
+			      (-f freqShiftBins notyet)";
 
 
         *quiet = 0;
 /* 
         loop over all the options in list
 */
-	    strcpy(codeProgName,PRGNAME_PNCODE);/* default progam */
         while ((--argc>0) && ((*++argv)[0] == '-')){ 
           c = argv[0][1];
           switch (c) {
-          case 'a':
-                   getval(optarg);
-				   strncpy(codeProgName,optarg,131);
-				   codeProgName[131]=0;
-                   break;
           case 'b':
                    getval(optarg);
                    sscanf(optarg,"%d",bits);
@@ -930,18 +927,35 @@ void    processargs
                    getval(optarg);
                    sscanf(optarg,"%f",freqShift);
                    break;
+          case 'g':
+                   getval(optarg);
+				   to_lowercase(optarg);
+				   if (!strncmp(optarg,"ao",2)){
+						*codetype=CODETYPE_PNC_SITE_AO;
+				   } else if (!strncmp(optarg,"dsn",3)){
+						*codetype=CODETYPE_PNC_SITE_DSN;
+				   } else if (!strncmp(optarg,"bar",3)){
+						*codetype=CODETYPE_BARKER;
+				  } else {
+					goto errout;
+				  }
+                   break;
           case 'm':
                    getval(optarg);
-				   if ( strncmp(optarg,"floats",6) == 0) {
+				   if ( (optarg[0]== 'u')|| ( optarg[0]== 'U')) {
 						*inputType=INPTYPE_UNPACKED;
+				   } else if ( strncmp(optarg,"floats",6) == 0) {
+						*inputType=INPTYPE_UNPACKED;		// to keep jean luc happy
 				   } else if ( strncmp(optarg,"ri",2) == 0) {
 						*inputType=INPTYPE_RI;
 				   } else if ( strncmp(optarg,"cbr",3) == 0) {
 						*inputType=INPTYPE_CBR;
 				   } else if ( strncmp(optarg,"pfs",3) == 0) {
-						*inputType=INPTYPE_PFS;
+					   *inputType=INPTYPE_PFS;
 				   } else if ( strncmp(optarg,"bytes",5) == 0) {
-						*inputType=INPTYPE_BYTES;
+		               *inputType=INPTYPE_BYTES;
+				   } else if ( strncmp(optarg,"pdev",4) == 0) {
+		               *inputType=INPTYPE_PDEV;
 				   } else {
 					    goto errout;
 				   }
@@ -967,8 +981,7 @@ void    processargs
 /*
         here if illegal option or argument
 */
-errout: fprintf(stderr,"%s\n",rcsid);
-        fprintf(stderr,"%s\n",USAGE);
+errout: fprintf(stderr,"%s\n",USAGE);
         exit(1);
         /*NOTREACHED*/
 }
@@ -1003,69 +1016,90 @@ void unpcbr (
 	}
 	return;
 }
-
 /*****************************************************************************
-*unppfs - unpack the pfs data                                           
-*
-* unpack the pfs data. 
-*/
-void unppfs (
-	int		bytesInp,	/* in buffer to unpack*/
-	int             bits,		/* quantization */
-	int		numPol,
-	int		polToUse,
-	unsigned char  *packedBuf, /* buffer to unpack*/
-	float	       *punpackedBuf
-	)
+ *unppdev - unpack the pdevdata                                           
+ *
+ * unpack the pdev data. 
+ */
+ void unppdev(
+       int             bytesInp,       /* in buffer to unpack*/
+       int             bits,           /* quantization */
+       int             numPol,
+       int             polToUse,
+       unsigned char *packedBuf, /* buffer to unpack*/
+       float   *punpackedBuf
+       )
 {
-  int j;
-  int nsamples = bytesInp * 4 / bits / numPol;
-
-  if (numPol == 1) 
-    switch (bits)
-      {
-      case  2: unpack_pfs_2c2b(packedBuf, rcp, bytesInp); break;
-      case  4: unpack_pfs_2c4b(packedBuf, rcp, bytesInp); break;
-      case  8: unpack_pfs_2c8b(packedBuf, rcp, bytesInp); break;
-      default: fprintf(stderr,"Unknown value for quantization mode\n"); 
-	       exit(-1);
-      }
-  else
-    if (polToUse == 1)
-      {
-	if (bits == 2)
-	  unpack_pfs_4c2b_rcp(packedBuf, rcp, bytesInp); 
-	else
-	  unpack_pfs_4c4b_rcp(packedBuf, rcp, bytesInp); 
+  
+   if (numPol == 1)  {
+     switch (bits)
+       {
+       case 4: unpack_pdev_2c4b_f4(packedBuf, punpackedBuf, bytesInp); break;
+	    default:fprintf(stderr,"Illegal bits for pdev data\n");
+		        exit(-1);
        }
-    else
-      {
-	if (bits == 2)
-	  unpack_pfs_4c2b_lcp(packedBuf, rcp, bytesInp); 
-	else
-	  unpack_pfs_4c4b_lcp(packedBuf, rcp, bytesInp); 
-      }
-
-  for (j = 0; j < 2*nsamples; j++)
-      punpackedBuf[j]   = (float) rcp[j];
-
+    }  else {
+        if (polToUse == 1) {
+        	unpack_pdev_4c4b_rcp_f4(packedBuf, punpackedBuf, bytesInp);
+        } else {
+            unpack_pdev_4c4b_lcp_f4(packedBuf, punpackedBuf, bytesInp);
+        }
+    }
+  return;
+}
+ /*****************************************************************************
+ *unppfs - unpack the pfs data                                           
+ *
+ * unpack the pfs data. 
+ */
+ void unppfs (
+       int             bytesInp,       /* in buffer to unpack*/
+       int             bits,           /* quantization */
+       int             numPol,
+       int             polToUse,
+       unsigned char *packedBuf, /* buffer to unpack*/
+       float   *punpackedBuf
+       )
+{
+   
+   if (numPol == 1)  {
+     switch (bits)
+       {
+       case 2: unpack_pfs_2c2b_f4(packedBuf, punpackedBuf, bytesInp); break;
+       case 4: unpack_pfs_2c4b_f4(packedBuf, punpackedBuf, bytesInp); break;
+       case 8: unpack_pfs_2c8b_f4(packedBuf, punpackedBuf, bytesInp); break;
+       }
+	}  else {
+		if (bits == 2) {
+       		if (polToUse == 1) {      
+         		unpack_pfs_4c2b_rcp_f4(packedBuf, punpackedBuf, bytesInp); 
+         	}  else {
+           		unpack_pfs_4c2b_lcp_f4(packedBuf, punpackedBuf, bytesInp); 
+			}
+		} else {
+       		if (polToUse == 1) {      
+         		unpack_pfs_4c4b_rcp_f4(packedBuf, punpackedBuf, bytesInp); 
+        	} else {
+         		unpack_pfs_4c4b_lcp_f4(packedBuf, punpackedBuf, bytesInp); 
+			}
+     	}
+	}
   return;
 }
 /*****************************************************************************
-*unpbytes - unpack 8 bit quantities
-*
-* unpack bytes
-*/
-void unpbytes (
-	int		bytesInp,	/* in buffer to unpack*/
-	unsigned char *packedBuf, /* buffer to unpack*/
-	float	*punpackedBuf
-	)
-{
-  int i;
-  for (i = 0; i < bytesInp; i++)
-    punpackedBuf[i] = (float) packedBuf[i];
+ *unpbytes - unpack 8 bit quantities
+ *
+ * unpack bytes
+ */
+ void unpbytes (
+       int             bytesInp,       /* in buffer to unpack*/
+       unsigned char *packedBuf, /* buffer to unpack*/
+       float   *punpackedBuf
+      )
+ {
+   int i;
+   for (i = 0; i < bytesInp; i++)
+     punpackedBuf[i] = (float) packedBuf[i];
 
-  return;
+   return;
 }
-
