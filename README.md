@@ -15,6 +15,16 @@ The goals of this repository are to facilitate the maintenance and improve the p
 # Test 
  In Ubuntu 18.10, CentOS Linux 7
 
+# Basic usage
+
+- for cw data to get the fft powers in two polarizations:
+- %drv_cw.sc controlfile firstscan lastscan
+
+
+- for delay-doppler data to get the images:
+- %export DRVSB=controlfile OR sbdrv controlfile
+- %drv_all.sc [-d -c] 1st_file numfiles
+- %drv_mapmsc.sc {opts} file1 numfiles toavg map/row {newRowLen} {newColLen}{colOff}
 
 # Task list
 
