@@ -1,45 +1,59 @@
 # example drv.dat.
+# last updated 15jul99
+#--> user must specify. others could be obtained from header
+#
 # key                    value            programs that use it
 #
+# bw=2usec*2047 = 244.2598925 hz.
+# 1000 ephmdelay, txoffset=10hz.
+# object about 2.4 hz wide cw. 
+## use 2K XForm. .1193 hz resolution or 20 points 
+#  use 512 XForm.  since warm receiver..
+# 20aug99 - added  compcodeprog
 #
-fbase       toutatis  drv_decode.sc drv_decodepwr.sc
+#
+fbase   /share/cuca4/nolan/Golevka/31may99/2U/gol31_U2 drv_decode.sc drv_decodepwr.sc
 #                     drv_decodeskip.sc  drv_fft_pwr.sc
 #                     drv_fft_pwr_add.sc drv_invert.sc
 #                     drv_power.sc        map_sel.sc
 #                     movefiles.sc        tapetodisc.sc
 #
-tapedev     /dev/nst0
-codelen     65535     drv_decode.sc     drv_decodepwr.sc
+tapedev     /dev/nrst12
+codelen     2047        drv_decode.sc     drv_decodepwr.sc
 #                     drv_decodeskip.sc
 #
-bits            2     drv_decode.sc       drv_decodepwr.sc
+bits           4          drv_decode.sc       drv_decodepwr.sc
 #                     drv_decodeskip.sc
 #
-numpol          2     drv_decode.sc   drv_decodepwr.sc
+numpol        2           drv_decode.sc   drv_decodepwr.sc
 #                     drv_decodeskip.sc
 #
-poltouse        1     only makes a dif if numpol==2
-bin1        29001     drv_decode.sc       drv_decodeskip.sc
+poltouse     1            implemented... 14aug98.. only make a dif
+#                                                  if numpol==2
+bin1         1        drv_decode.sc       drv_decodeskip.sc
 #
-numbins      2000     drv_decode.sc   drv_decodeskip.sc
-smpperbaud      1     drv_mapmsc.sc test_drv_decode.sc
+numbins      2047         drv_decode.sc   drv_decodeskip.sc
+smpperbaud   1        drv_mapmsc.sc test_drv_decode.sc
 #			
-machine       pfs     ri,cbr,pfs,bytes,floats
-dcdpacked       0     0, or 1,2,4 samples/32bit word
+machine      ri      ri,cbr,unpacked 
+dcdpacked    0       0, or 1,2,4 samples/32bit word
 #                     drv_invert.sc   drv_power.sc
 #
-dcdfftlen  131072     drv_decode.sc   drv_decodepwr.sc
+dcdfftlen   131072            drv_decode.sc   drv_decodepwr.sc
+numthreads   1       if > 1 then used multithreadedd fft for decode
 #                     drv_decodeskip.sc
 #
-codestodecode 9999999 drv_decode.sc     drv_decodepwr.sc
+codestodecode   999999  drv_decode.sc     drv_decodepwr.sc
 removedc        1     remove dc prior to decoding
 #                     drv_decodeskip.sc
 #
-cohavg          1     
+cohavg      0          ...coherent averages    main_decode.sc
 #
-spcfftlen     512     drv_pwr_fft.sc
-spcfftkeep    512     drv_pwr_fft.sc save # frqs about dec
-compcodeprog /home/pfs/bin/comppncode
+spcfftlen   512       drv_pwr_fft.sc
+spcfftkeep  512         drv_pwr_fft.sc save # frqs about dec
+codetype    aopnc     aopnc,dsnpnc, barker .. main_decode.sc
+xoff        0        freq correction Hz. drv_fft_pwr.sc
+tmsmp       0        sample time. needed if xoff specified. eg 1e-6
 #
 #   suffixes for programs..
 #   see end of README for who uses what
@@ -48,7 +62,6 @@ sufraw      raw
 sufdcd      dcd
 suftrn      trn
 sufspc      map
-sufslc      slc
 sufeng          eng
 sufpha          pha
 sufscl          maps
