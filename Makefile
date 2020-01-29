@@ -10,13 +10,14 @@ FFLAGS=-O
 LPATH=$(HOME)/lib
 CC=gcc
 
-all: scripts radardecode rotate selectpnts scaletosigma makefits mapsmerge avgdata stripVme unpriV zerofill fftfilter power_ao convdatatype
+all: scripts radardecode rotate selectpnts scaletosigma makefits mapsmerge radarfft avgdata stripVme unpriV zerofill fftfilter power_ao convdatatype
 
 FORCE:
 	
 scripts: FORCE
 	chmod u+w scripts/*
 	cp scripts/*.sc $(GLOBDIR)
+	cp scripts/*.awk $(GLOBDIR)
 	cp scripts/printbyteorder $(GLOBDIR)
 
 #comppncode: comppncode.c to_lowercase.o comppnc_init.o comppnc_shiftit.o
@@ -43,7 +44,7 @@ mapsmerge: mapsmerge.c
 	$(CC) $(CFLAGS) mapsmerge.c -lm -o $(GLOBDIR)/mapsmerge
 
 radarfft: radarfft.c read_pipe.o
-	$(CC) $(CFLAGS) radarfft.c read_pipe.o -L$(LPATH) -lfftw -lm -o $(GLOBDIR)/radarfft
+	$(CC) $(CFLAGS) radarfft.c read_pipe.o -L$(LPATH) -lfftw3f -lm -o $(GLOBDIR)/radarfft
 
 
 avgdata: avgdata.c read_pipe.o to_lowercase.o
