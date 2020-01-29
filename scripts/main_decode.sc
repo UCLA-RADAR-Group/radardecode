@@ -13,6 +13,8 @@
 #			  now have units of samples rather than bauds.
 #     4aug99 - changes for -m cbr ri unpacked, -p numPol poltouse
 #
+#    10Feb03  MCN fixed typos wrt codeprog
+#
 #	set some variables
 #
 #set verbose
@@ -30,15 +32,18 @@
 #	fftlen		length fft to use in decoding
 #	numcodes	to process
 #	removeDc
-#	machinetype    ri,cbr,pfs,bytes,floats
-#   compcodeprog   /home/pfs/bin/comppncode
+#	machinetype    ri,unpacked cbr 
+#   codeprog   /usr/local/bin/comppncode
 #	
 set debugopt=""
-set decodeprog="radardecode"
+set decodeprog_sng="radardecode"
+set decodeprog_thr="radardecode_thr"
+#
+set decodeprog=$decodeprog_sng
 set validbits=(1 2  4 8 12)
 # sneak in 13 as a valid code since barker code 13 is used
 set validcodes=(1 3 7 13 15 31 63 127 255 511 1023 2047 4095 8191 16383 32767 65535 131071)
-set validlenfft=(2 4 8 16 32 64 128 256 512 1024 2048 4096 8192 16384 32768                      65536 131072 262144 524288 1048576)
+set validlenfft=(2 4 8 16 32 64 128 256 512 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576 2097152)
 #
 #	get input filename
 echo "Enter input filename"
@@ -123,20 +128,19 @@ if ( `expr \( $numchan \< 1 \) \| \( $numchan \> $codelenused \) ` ) then
 	   goto done
 endif
 #
-#	get fftlen
+#	get fftlen we no longer check it
 #
 echo "Enter length for fft (power of 2)"
 set fftlen=$<
-unset gotit
-foreach var ($validlenfft)
-	if ( `expr $var = $fftlen` ) then    
-           set gotit
-	   break 
-	endif
-end
-if (!($?gotit)) then
-   	echo "illegal fftlen $fftlen"
-   	goto done
+#
+#	get number of threads > 1 --> threading
+#
+echo "Number of threads to use > 1 --> threaded fftw"
+set numthreads=$<
+set thropt=''
+if ( $numthreads > 1 ) then 
+	set decodeprog=$decodeprog_thr
+	set thropt="-e $numthreads"
 endif
 #
 #	records to process
@@ -153,7 +157,6 @@ if ( $removedc == 0) then
 else
 	set rmdc="-r"
 endif
-#echo "removedc: $rmdc"
 #
 #       get number of codes to incoherently  avg
 #
@@ -164,10 +167,9 @@ set cohavg=$<
        goto done
     endif
 #
-#
 #	machine type
 #
-echo "machine type (ri,cbr,pfs,bytes,floats)"
+echo "machine type (ri,cbr,pfs,bytes,floats or unpacked)"
 set machinetype=$<
 if ( $machinetype == 0) then
 	set machinetype="ri"
@@ -176,15 +178,19 @@ else
 endif
 echo "machinetype: $machinetype"
 #
-#	code program
+#	code type aopnc,dsnpnc barker
 #
-echo "codeprog"
-set codeprog=$<
-echo "codeprog: $codeprog"
+echo "codetype"
+set codetype=$<
+if ( ($codetype != aopnc) & ($codetype != dsnpnc) & ($codetype != barker) ) then
+       echo "illegal codetype:$codetype. values are: aopnc dsnpnc barker"
+       goto done
+endif
+echo "codetype: $codetype"
 #
 set numffts=`expr 1 + $numcodes \* $codelenused / \( $fftlen - $codelenused + 1 \) `
-@ codelen2= $codelen * 2
 @ discsize=$numcodes * $numchan * 8
+@ codelen2= $codelen * 2
 echo "doing $numffts ffts to decode $numcodes codes"
 echo "disc file will be $discsize bytes"
 #
@@ -199,30 +205,25 @@ echo "disc file will be $discsize bytes"
 #  set pol to 1 or 2 for pol 1 or 2. if only 
 echo " # pol=${numpol},using pol:${pol}. decode prog:${decodeprog}"
 echo "start:`date`."
-# some verbosity added by jlm
-echo $decodeprog  -b $bits -c $codelen -l $fftlen -n $numcodes -o .5 -s $smpperbaud  $rmdc $debugopt -m $machinetype -p $numpol $pol -a $codeprog
-#if ( `expr  \( $numpol = 2 \) \& \( $machinetype = "ri" \) ` ) then    
-#        dd if=$inputfile bs=64k | \
-#	selectpnts -b 4 -f $pol -s $numpol | \
-#$decodeprog -b $bits -c $codelen -l $fftlen -n $numcodes -o .5 -s $smpperbaud    $rmdc -a $codeprog |\
-#	selectpnts -b 8 -f $chan1 -g $numchan -s $codelenused > $outputfile
 #
-# jlm changes ri dual-pol option to cohavg option
-# ri dual-pol data no longer supported
-# if you really want it, uncomment previous 5-line block and comment out next 5-line block
-if (`expr  \( $cohavg \> 1 \)`) then 
-        dd if=$inputfile bs=64k | \
- $decodeprog  -b $bits -c $codelen -l $fftlen -n $numcodes -o .5 -s $smpperbaud  $rmdc $debugopt -m $machinetype -p $numpol $pol -a $codeprog |\
-	avgdata -d r4 -g $codelen2 -h $cohavg |\
- 	selectpnts -b 8 -f $chan1 -g $numchan -s $codelenused > $outputfile
+#	build cmd 1 step at a time then eval
+#
+set cmd=" dd if=$inputfile bs=64k |"
+#
+#  if 2 pol data select the pol to use
+#
+if ( `expr  \( $numpol = 2 \) \& \( $machinetype = "ri" \) ` ) then    
+	set cmd="$cmd selectpnts -b 4 -f $pol -s $numpol | $decodeprog -b $bits -c $codelen -l $fftlen -n $numcodes -o .5 -s $smpperbaud $rmdc -g $codetype $thropt |"
 else
-        dd if=$inputfile bs=64k | \
- $decodeprog  -b $bits -c $codelen -l $fftlen -n $numcodes -o .5 -s $smpperbaud  $rmdc $debugopt -m $machinetype -p $numpol $pol -a $codeprog |\
- 	selectpnts -b 8 -f $chan1 -g $numchan -s $codelenused > $outputfile
+	set cmd="$cmd $decodeprog -b $bits -c $codelen -l $fftlen -n $numcodes -o .5 -s $smpperbaud $rmdc $debugopt -m $machinetype -p $numpol $pol -g $codetype $thropt|"
 endif
+#
+# coherent averages
+#
+if (`expr  \( $cohavg \> 1 \)`) then
+	set cmd="$cmd avgdata -d r4 -g $codelen2 -h $cohavg|"
+endif
+set cmd="$cmd selectpnts -b 8 -f $chan1 -g $numchan -s $codelenused > $outputfile"
+eval $cmd
 echo "end  :`date`"
-
-
-
 done:
-
