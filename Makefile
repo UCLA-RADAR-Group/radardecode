@@ -17,7 +17,6 @@ FORCE:
 scripts: FORCE
 	chmod u+w scripts/*
 	cp scripts/*.sc $(GLOBDIR)
-	cp scripts/*.awk $(GLOBDIR)
 	cp scripts/printbyteorder $(GLOBDIR)
 
 #comppncode: comppncode.c to_lowercase.o comppnc_init.o comppnc_shiftit.o

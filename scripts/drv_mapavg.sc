@@ -32,7 +32,7 @@ else
   echo "Usage:drv_mapavg.sc 1stfile numfile filestoavg 1stfilenumout (maps/map)"
   exit(-1)
 endif
-set sufout=`ex.awk $DRVSB sufspc`
+set sufout=`keyval.sc< $DRVSB sufspc`
 set outbase="${basefile}.${sufin}f"
 set outbase0="${basefile}.${sufout}f"
 set inbase="${basefile}.${sufin}f"
