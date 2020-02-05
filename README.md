@@ -12,6 +12,9 @@ The goals of this repository are to facilitate the maintenance and improve the p
 - Specify installation directory in Makefile
 - % make
 
+updated according to:
+https://github.com/UCLA-RADAR-Group/aosoft/commit/fc8dec2e3263f7588f930bfde9a1ddfedb01f753
+
 # Test 
  In Ubuntu 18.10, CentOS Linux 7
 
