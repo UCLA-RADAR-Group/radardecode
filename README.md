@@ -33,7 +33,8 @@ https://github.com/UCLA-RADAR-Group/aosoft/commit/fc8dec2e3263f7588f930bfde9a1dd
 
 - [x] Most of this code was collected from multiple directories into a single location around 2005.  Current versions of the programs from /pkg/aosoft/common/bin/ and elsewhere should be integrated.
 - [x] Some of this code probably relies on version 2 of the FFTW library.  Changes should be made to support version 3 of the FFTW library.   (branch and . work)
-- [ ] A validation procedure should be added to enable testing of new installations.  
+- [ ] automatically use/install fftw3 
+- [ ] A validation procedure should be added to enable testing of new installations  
 
 # Credits
 
