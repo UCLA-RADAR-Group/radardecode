@@ -12,24 +12,27 @@ prerequisites:
     - ./configure --enable-float --prefix=${HOME}  
     -  make  
     -  make install  
+  
     OR For Ubuntu :  
-        sudo apt-get install fftw3  
-        sudo apt-get install fftw3-dev  
-        /usr/lib/libfftw3f.a  
-        /usr/lib/libfftw3f.so  
-        /usr/include/fftw3.h  
+    - sudo apt-get install fftw3    
+    - sudo apt-get install fftw3-dev    
+  
+    - /usr/lib/libfftw3f.a  
+    - /usr/lib/libfftw3f.so  
+    - /usr/include/fftw3.h  
     OR For CentOS :  
-        sudo yum install fftw3  
-        sudo yum install fftw3-devel  
-        /lib64/libfftw3f.a  
-        /lib64/libfftw3f.so.3  
-        /usr/include/fftw3.h  
+    - sudo yum install fftw3    
+    - sudo yum install fftw3-devel  
+  
+    - /lib64/libfftw3f.a    
+    - /lib64/libfftw3f.so.3  
+    - /usr/include/fftw3.h  
+  
+- git clone git@github.com:UCLA-RADAR-Group/radardecode.git  
+    make in radardecode folder
 
-    git clone git@github.com:UCLA-RADAR-Group/radardecode.git  
-    make in radardecode  
-
-#updated according to:
-https://github.com/UCLA-RADAR-Group/aosoft/commit/fc8dec2e3263f7588f930bfde9a1ddfedb01f753
+#updated according to:  
+https://github.com/UCLA-RADAR-Group/aosoft/commit/fc8dec2e3263f7588f930bfde9a1ddfedb01f753  
 
 # Basic usage
 
