@@ -20,6 +20,7 @@ prerequisites:
     - /usr/lib/libfftw3f.a  
     - /usr/lib/libfftw3f.so  
     - /usr/include/fftw3.h  
+  
     OR For CentOS :  
     - sudo yum install fftw3    
     - sudo yum install fftw3-devel  
