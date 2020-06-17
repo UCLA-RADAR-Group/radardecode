@@ -1,0 +1,59 @@
+#
+# 4us 1k single channel (coarse ranging mode). BW= 244 Hz.
+#
+# key       value            programs that use it
+#
+#
+fbase    test.1k  drv_decode.sc drv_decodepwr.sc
+#                     drv_decodeskip.sc  drv_fft_pwr.sc
+#                     drv_fft_pwr_add.sc drv_invert.sc
+#                     drv_power.sc        map_sel.sc
+#                     movefiles.sc        tapetodisc.sc
+#
+tapedev     /share/olda/datafile.29may19.r3037.1
+#
+codelen      1023     drv_decode.sc     drv_decodepwr.sc
+#                     drv_decodeskip.sc
+#
+bits            4     drv_decode.sc       drv_decodepwr.sc
+#                     drv_decodeskip.sc
+#
+numpol          1     drv_decode.sc   drv_decodepwr.sc
+#                     drv_decodeskip.sc
+#
+poltouse        1     only makes a dif if numpol==2
+bin1            1     drv_decode.sc       drv_decodeskip.sc
+#
+numbins      1023     drv_decode.sc   drv_decodeskip.sc
+smpperbaud      1     drv_mapmsb.sc test_drv_decode.sc
+#           
+machine        ri     choices are: ri,cbr,pfs,bytes,floats
+dcdpacked       0     0, or 1,2,4 samples/32bit word
+#                     drv_invert.sc   drv_power.sc
+#
+dcdfftlen    8192     drv_decode.sc   drv_decodepwr.sc
+#                     drv_decodeskip.sc
+#
+codestodecode 99999999 drv_decode.sc     drv_decodepwr.sc
+removedc        1     remove dc prior to decoding
+#                     drv_decodeskip.sc
+#
+cohavg          0     drv_decodepwr.sc    drv_power.sc
+#
+spcfftlen    16   drv_fft_pwr.sc
+# about 1 Hz
+spcfftkeep    16  drv_fft_pwr.sc save # frqs about dec
+compcodeprog comppncode
+nthreads 4
+#
+#   suffixes for programs..
+#   see end of README for who uses what
+#
+sufraw      raw
+sufdcd      dcd
+suftrn      trn
+sufspc      map
+sufslc      slc
+sufeng      eng
+sufpha      pha
+sufscl      maps
