@@ -43,10 +43,12 @@ if [ $(du -k mo | cut -f1) -eq "0" ];then u4_param_1=1; fi
 
 #=====================================================
 
-if [ $cw_param_1 -eq 1 ]; then echo "doppler processing works "; fi
-if [ $u4_param_1 -eq 1 ]; then echo " ri delay-doppler processing tested : works"; fi
 
-if [ $cw_param_1 -eq 0 ]; then echo "doppler processing doesn't work "; fi
-if [ $u4_param_1 -eq 0 ]; then echo " ri delay-doppler processing tested : does not work"; fi
+echo "===========RESULT========="
+if [ $cw_param_1 -eq 1 ]; then echo " doppler processing works "; fi
+if [ $u4_param_1 -eq 1 ]; then echo " ri delay-doppler processing works"; fi
+
+if [ $cw_param_1 -eq 0 ]; then echo " doppler processing does not work "; fi
+if [ $u4_param_1 -eq 0 ]; then echo " ri delay-doppler processing does not work"; fi
 
 
