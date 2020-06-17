@@ -1,0 +1,6 @@
+ To test the installation run:
+#run as : ./validation.sh <validation path_to_validation_folder>
+#example : ./validation.sh ~/src
+
+
+
