@@ -4,7 +4,6 @@ The goals of this repository are to facilitate the maintenance and improve the p
 
 # Installation procedure
 
-prerequisites:  
 - need "make", "csh", "gcc", perl  
   
 - Also need fftw library version 3 (3.3.8) :  
