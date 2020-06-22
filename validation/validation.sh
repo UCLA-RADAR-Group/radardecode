@@ -18,15 +18,9 @@ paste hdt_1_3 hd_1_3 > hd
 paste tlt_1_2 tl_1_2 > tl
 paste hdt_2_3 hd_2_3 > hd2
 cat hd | awk '{if(($1-$2)>10000 || ($1-$2)<-10000) print ($1-$2)}' > mo
-if [ $(du -k mo | cut -f1) -eq "0" ];then cw_param_1=1; else cw_param_1=0; fi
-if [ $cw_param_1 -eq 1 ]; then 
-    cat tl | awk '{if(($1-$2)>10000 || ($1-$2)<-10000) print ($1-$2)}' > mo
-    if [ $(du -k mo | cut -f1) -eq "0" ];then cw_param_1=1; else cw_param_1=0; fi
-fi
-if [ $cw_param_1 -eq 1 ]; then 
-    cat hd2 | awk '{if(($1-$2)>10000 || ($1-$2)<-10000) print ($1-$2)}' > mo
-    if [ $(du -k mo | cut -f1) -eq "0" ];then cw_param_1=1; else cw_param_1=0; fi
-fi
+cat tl | awk '{if(($1-$2)>10000 || ($1-$2)<-10000) print ($1-$2)}' >> mo
+cat hd2 | awk '{if(($1-$2)>10000 || ($1-$2)<-10000) print ($1-$2)}' >> mo
+if [ $(du -k mo | cut -f1) -eq "0" ];then cw_param_1=1; fi
 
 #1k u4 DATA==============================
 # 1 run========================================
