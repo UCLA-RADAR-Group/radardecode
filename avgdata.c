@@ -3,7 +3,11 @@
 #include		<unistd.h>
 #include		<string.h>
 #include        <fcntl.h>
+#ifdef __APPLE__
+#include        <malloc/malloc.h>
+#else
 #include        <malloc.h>
+#endif
 #include		<philLib.h>
 /*
  *                         Filter to average data.

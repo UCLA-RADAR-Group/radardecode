@@ -1,7 +1,11 @@
 #include        <stdio.h>
 #include        <stdlib.h>
 #include        <fcntl.h>
+#ifdef __APPLE__
+#include        <malloc/malloc.h>
+#else
 #include        <malloc.h>
+#endif
 #include <unistd.h>
 #include <philLib.h> 
  
