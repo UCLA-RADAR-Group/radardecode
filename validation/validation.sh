@@ -17,14 +17,14 @@ head tmp1 | awk '{print $3}' > hdt_2_3
 paste hdt_1_3 hd_1_3 > hd
 paste tlt_1_2 tl_1_2 > tl
 paste hdt_2_3 hd_2_3 > hd2
-cat hd | awk '{if(($1-$2)>10000 && ($1-$2)<-10000) print ($1-$2)}' > mo
+cat hd | awk '{if(($1-$2)>10000 || ($1-$2)<-10000) print ($1-$2)}' > mo
 if [ $(du -k mo | cut -f1) -eq "0" ];then cw_param_1=1; fi
 if [ $cw_param_1 -eq 1 ]; then 
-    cat tl | awk '{if(($1-$2)>10000 && ($1-$2)<-10000) print ($1-$2)}' > mo
+    cat tl | awk '{if(($1-$2)>10000 || ($1-$2)<-10000) print ($1-$2)}' > mo
     if [ $(du -k mo | cut -f1) -eq "0" ];then cw_param_1=1; fi
 fi
 if [ $cw_param_1 -eq 1 ]; then 
-    cat hd2 | awk '{if(($1-$2)>10000 && ($1-$2)<-10000) print ($1-$2)}' > mo
+    cat hd2 | awk '{if(($1-$2)>10000 || ($1-$2)<-10000) print ($1-$2)}' > mo
     if [ $(du -k mo | cut -f1) -eq "0" ];then cw_param_1=1; fi
 fi
 
@@ -37,7 +37,7 @@ sleep 2
 drv_mapmsc.sc 1 1 1 1
 python3 ../pixvalue.py u4 > tmp
 paste tmp val1 > vtmp
-cat vtmp | awk '{if(($1-$2)>0.0001 && ($1-$2)<-0.0001) print ($1-$2)}' >mo
+cat vtmp | awk '{if(($1-$2)>0.0001 || ($1-$2)<-0.0001) print ($1-$2)}' >mo
 if [ $(du -k mo | cut -f1) -eq "0" ];then u4_param_1=1; fi
 
 
