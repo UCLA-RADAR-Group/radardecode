@@ -27,7 +27,11 @@ The goals of this repository are to facilitate the maintenance and improve the p
     - /lib64/libfftw3f.a    
     - /lib64/libfftw3f.so.3  
     - /usr/include/fftw3.h  
-  
+
+    OR For MacOS
+    - sudo port install fftw-3-single
+    - /opt/local/include/fftw3.h
+
 - git clone git@github.com:UCLA-RADAR-Group/radardecode.git  
     make in radardecode folder
 

@@ -1,6 +1,11 @@
 #include    <datkLib.h>
 #include    <unpri.h>
-#include    <byteswap.h>
+#ifdef __APPLE__                
+#include <libkern/OSByteOrder.h>
+#define bswap_16(x) OSSwapInt16(x)
+#else
+#include <byteswap.h>
+#endif
 /*****************************************************************************
 *unpriV_i4 -  unpack vmeRi data to ints   
 *

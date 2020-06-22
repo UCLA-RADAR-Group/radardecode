@@ -5,7 +5,12 @@
 #include        <memory.h>
 #include        <hdrLib.h>
 #include        <unistd.h>
-#include        <byteswap.h>
+#ifdef __APPLE__                
+#include <libkern/OSByteOrder.h>
+#define bswap_32(x) OSSwapInt32(x)
+#else
+#include <byteswap.h>
+#endif
 #include	    <philLib.h>
 
 #define         MAXBUFSIZE   1024*1024
