@@ -63,14 +63,14 @@ This repository contains a portable and compact version of the radar processing 
 
 - To process continuous wave data into power spectra:  
 
-  % drv_cw.sc controlfile firstscan lastscan
-  % [e.g.,] drv_cw.sc drvcw.dat 1 1
+  % drv_cw.sc controlfile firstscan lastscan  
+  % [e.g.,] drv_cw.sc drvcw.dat 1 1  
 
 - To process delay-doppler data into images:   
 
-  % export DRVSB=controlfile 
-  % drv_all.sc [-d -c] 1st_file numfiles  
-  % [e.g.,] drv_all.sc 1 1 
+  % export DRVSB=controlfile  
+  % drv_all.sc [-d -c] 1st_file numfiles    
+  % [e.g.,] drv_all.sc 1 1   
   % drv_mapmsc.sc {opts} file1 numfiles toavg map/row {newRowLen} {newColLen}{colOff}  
 
   
