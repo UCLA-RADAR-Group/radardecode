@@ -4,7 +4,7 @@
 from astropy.io import fits
 import numpy as np
 import sys
-fits_image_filename = 'Fits/check.fit'
+fits_image_filename = 'Fits/result.fit'
 hdul = fits.open(fits_image_filename)
 data = hdul[0].data
 
