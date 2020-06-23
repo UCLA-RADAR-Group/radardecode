@@ -5,12 +5,18 @@
 # HOME=/home/pfs
 SHELL=/bin/csh
 GLOBDIR=$(HOME)/bin
-CFLAGS=-O4 -I. -I${HOME}/include  -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DLINUX -I/opt/local/include
+CFLAGS=-O4 -I. -I./include -I${HOME}/include  -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DLINUX -I/opt/local/include
 FFLAGS=-O
 LFLAGS=-L$(HOME)/lib -L/opt/local/lib
 CC=gcc
 
 all: scripts radardecode rotate selectpnts scaletosigma makefits mapsmerge radarfft avgdata stripVme unpriV zerofill fftfilter power_ao convdatatype
+
+tests:
+	cd validation; ./validate.sh
+
+clean:
+	rm *.o
 
 FORCE:
 	
@@ -49,11 +55,11 @@ radarfft: radarfft.c read_pipe.o
 avgdata: avgdata.c read_pipe.o to_lowercase.o
 	$(CC) $(CFLAGS) avgdata.c read_pipe.o to_lowercase.o -lm -o $(GLOBDIR)/avgdata
 
-stripVme: stripVme.c read_pipe.o hdrLib.h
+stripVme: stripVme.c read_pipe.o 
 	$(CC) $(CFLAGS) stripVme.c read_pipe.o -o $(GLOBDIR)/stripVme
+
 unpriV: unpriV.c read_pipe.o unpriV_i4.o unpriV_f4.o unpriV_i2.o unpriV_d8.o 
 	$(CC) $(CFLAGS) unpriV.c read_pipe.o unpriV_i4.o unpriV_f4.o unpriV_i2.o unpriV_d8.o -o $(GLOBDIR)/unpriV
-
 
 zerofill: zerofill.c read_pipe.o
 	$(CC) $(CFLAGS) zerofill.c read_pipe.o -lm -o $(GLOBDIR)/zerofill

@@ -1,12 +1,11 @@
+#!/bin/bash
+#run as : ./validate.sh
 
-#run as : ./validation.sh <validation path_to_validation_folder>
-#example : ./validation.sh ~/src
-stem=$1 #like ~/src
 cw_param_1=0
 u4_param_1=0
 #CW DATA====================
 #1 run p1 data=============================
-cd $stem/radardecode/validation/cw/
+cd cw
 drv_cw.sc drvcw.result 1 1
 sleep 2
 
@@ -47,15 +46,17 @@ if [ $(du -k result_hd2p1.cmp | cut -f1) -eq "0" ];then # if even a single file 
     cw_param_1=0;
 fi
 
+cd ..
+
 #1k u4 DATA==============================
 # 1 run========================================
-cd $stem/radardecode/validation/u4/
+cd u4
 export DRVSB=drv.1k
 drv_all.sc 1 1
 sleep 2
 drv_mapmsc.sc 1 1 1 1
 sleep 2
-mv Fits/f1x1.fit Fits/result.fit
+mv Fits/f1x1.fit Fits/result.fits
 python3 ../pixvalue.py u4 > result.val1
 paste result.val1 test.val1 > val1
 cat val1 | awk '{if(($1-$2)>0.0001 || ($1-$2)<-0.0001) print ($1-$2)}' > err
@@ -65,11 +66,13 @@ if [ $(du -k err | cut -f1) -eq "0" ];then u4_param_1=1; fi
 #=====================================================
 
 
-echo "===========RESULT========="
+echo "================================================="
+echo "=                    RESULTS                    ="
+echo "================================================="
 if [ $cw_param_1 -eq 1 ]; then echo " doppler processing works "; fi
-if [ $u4_param_1 -eq 1 ]; then echo " ri delay-doppler processing works"; fi
+if [ $u4_param_1 -eq 1 ]; then echo " delay-doppler processing works"; fi
 
 if [ $cw_param_1 -eq 0 ]; then echo " doppler processing does not work "; fi
-if [ $u4_param_1 -eq 0 ]; then echo " ri delay-doppler processing does not work"; fi
+if [ $u4_param_1 -eq 0 ]; then echo " delay-doppler processing does not work"; fi
 
-
+cd ..

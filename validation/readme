@@ -1,6 +1,6 @@
- To test the installation run:
-#run as : ./validation.sh <path_to_radardecode_folder>
-#example : ./validation.sh ~/src
+To test the installation run:
+./validate.sh 
+
 
 
 
