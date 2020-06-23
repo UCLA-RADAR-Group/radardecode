@@ -56,7 +56,7 @@ drv_all.sc 1 1
 sleep 2
 drv_mapmsc.sc 1 1 1 1
 sleep 2
-mv Fits/f1x1.fit Fits/result.fits
+mv Fits/f1x1.fit Fits/result.fit
 python3 ../pixvalue.py u4 > result.val1
 paste result.val1 test.val1 > val1
 cat val1 | awk '{if(($1-$2)>0.0001 || ($1-$2)<-0.0001) print ($1-$2)}' > err
