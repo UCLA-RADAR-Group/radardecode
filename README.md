@@ -1,6 +1,11 @@
 # Radardecode
 
-The goals of this repository are to facilitate the maintenance and improve the portability of the radar processing software developed at Arecibo.  The repository allows for the software to be installed and run outside of the Arecibo environment. 
+This repository contains a portable and compact version of the radar processing software developed at Arecibo.  Our goals are threefold:
+
+1. to provide a self-contained version of the software that can be easily installed outside of Arecibo's computing environment.  The code base is an order of magnitude smaller than the aosoft code base.  
+2. to improve the portability of the software.  We have introduced modifications that allow the code to compile and run on Linux and MacOS.  
+3. to encourage development and facilitate maintenance.  The GitHub repository allows users to easily compare versions and create pull requests for bug fixes or new features.  
+
 
 # Installation procedure
 
@@ -49,13 +54,6 @@ https://github.com/UCLA-RADAR-Group/aosoft/commit/fc8dec2e3263f7588f930bfde9a1dd
 - %drv_all.sc [-d -c] 1st_file numfiles  
 - %drv_mapmsc.sc {opts} file1 numfiles toavg map/row {newRowLen} {newColLen}{colOff}  
 
-# Task list
-
-- [x] Most of this code was collected from multiple directories into a single location around 2005.  Current versions of the programs from /pkg/aosoft/common/bin/ and elsewhere should be integrated.
-- [x] Some of this code probably relies on version 2 of the FFTW library.  Changes should be made to support version 3 of the FFTW library.   (branch and . work)
-- [x] automatically use/install fftw3 (updated instructions)
-- [x] A validation procedure should be added to enable testing of new installations  
-
 # Credits
 
-Most of the software was initially written by Phil Perillat.  
+Most of the software was written by Phil Perillat.  This repository was created by Jean-Luc Margot and uploaded to a CVS server in 2005 and to GitHub in 2019.  It was brought back in sync with the current revision (r2007) of aosoft by Sanjana Prabhu Desai and Jean-Luc Margot in 2020.
