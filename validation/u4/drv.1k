@@ -22,9 +22,9 @@ numpol          1     drv_decode.sc   drv_decodepwr.sc
 #                     drv_decodeskip.sc
 #
 poltouse        1     only makes a dif if numpol==2
-bin1            490  drv_decode.sc        drv_decodeskip.sc
+bin1            1  drv_decode.sc        drv_decodeskip.sc
 #
-numbins      25   drv_decode.sc   drv_decodeskip.sc
+numbins      1023   drv_decode.sc   drv_decodeskip.sc
 smpperbaud      1     drv_mapmsb.sc test_drv_decode.sc
 #           
 machine        ri     choices are: ri,cbr,pfs,bytes,floats
