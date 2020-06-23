@@ -3,7 +3,7 @@
 #       compilation and link flags are defined here
 #
 SHELL=/bin/csh
-CFLAGS=-O4 -I. -I../include -I/opt/local/include
+CFLAGS=-O3 -I. -I../include -I/opt/local/include
 LFLAGS=-L/opt/local/lib
 
 
