@@ -3,7 +3,7 @@
 
 
 inpfile      datafile.1
-fbase       test
+fbase   check
 bits        12
 numpol      2
 fftlen      64

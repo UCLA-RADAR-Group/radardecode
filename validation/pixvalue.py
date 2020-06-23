@@ -4,9 +4,9 @@
 from astropy.io import fits
 import numpy as np
 import sys
-fits_image_filename = 'Fits/f1x1.fit'
+fits_image_filename = 'Fits/check.fit'
 hdul = fits.open(fits_image_filename)
 data = hdul[0].data
 
 if sys.argv[1]=="u4":
-    print(data[496,8])
+    print(data[7,8])
