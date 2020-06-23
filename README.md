@@ -9,7 +9,7 @@ This repository contains a portable and compact version of the radar processing 
 
 # Requirements
 
-- Compilation and execution require bash, csh, tcsh, make, gcc, Perl (for printbyteorder), Python (for validation)
+- Compilation and execution require bash, csh, tcsh, make, gcc, Perl (for printbyteorder)
   
 - FFTW (version >= 3.3.8)
 
