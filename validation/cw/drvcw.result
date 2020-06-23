@@ -3,7 +3,7 @@
 
 
 inpfile      datafile.1
-fbase   result_64
+fbase   result
 bits        12
 numpol      2
 fftlen      64
