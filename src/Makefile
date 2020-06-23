@@ -3,11 +3,9 @@
 #       executables will be placed in GLOBDIR
 #
 SHELL=/bin/csh
-GLOBDIR=$(HOME)/bin
 CFLAGS=-O4 -I. -I../include -I${HOME}/include  -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DLINUX -I/opt/local/include
-FFLAGS=-O
 LFLAGS=-L$(HOME)/lib -L/opt/local/lib
-CC=gcc
+
 
 all: radardecode rotate selectpnts scaletosigma makefits mapsmerge radarfft avgdata stripVme unpriV zerofill fftfilter power_ao convdatatype
 
