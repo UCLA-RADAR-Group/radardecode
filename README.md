@@ -37,11 +37,27 @@ This repository contains a portable and compact version of the radar processing 
 
 # Installation procedure
 
-- git clone git@github.com:UCLA-RADAR-Group/radardecode.git  
-    make in radardecode folder
+- Download repository  
 
-#updated according to:  
-https://github.com/UCLA-RADAR-Group/aosoft/commit/fc8dec2e3263f7588f930bfde9a1ddfedb01f753  
+  With https:  
+  % git clone https://github.com/UCLA-RADAR-Group/radardecode.git  
+  % cd radardecode  
+  
+  With ssh:  
+  % git clone git@github.com:UCLA-RADAR-Group/radardecode.git  
+  % cd radardecode  
+
+- Specify the target location for scripts and executables.
+
+  Edit the value of GLOBDIR in top-level Makefile if necessary (default is $(HOME)/bin)
+  
+- Compile  
+
+  % make  
+
+- Run tests
+
+  % make tests
 
 # Basic usage
 
@@ -57,3 +73,6 @@ https://github.com/UCLA-RADAR-Group/aosoft/commit/fc8dec2e3263f7588f930bfde9a1dd
 # Credits
 
 Most of the software was written by Phil Perillat.  This repository was created by Jean-Luc Margot and uploaded to a CVS server in 2005 and to GitHub in 2019.  It was brought back in sync with the current revision (r2007) of aosoft by Sanjana Prabhu Desai and Jean-Luc Margot in 2020.
+
+This version is based on aosoft GitHub version  
+https://github.com/UCLA-RADAR-Group/aosoft/commit/fc8dec2e3263f7588f930bfde9a1ddfedb01f753  
