@@ -4,7 +4,7 @@
 # key       value            programs that use it
 #
 #
-fbase    check  drv_decode.sc drv_decodepwr.sc
+fbase    result drv_decode.sc drv_decodepwr.sc
 #                     drv_decodeskip.sc  drv_fft_pwr.sc
 #                     drv_fft_pwr_add.sc drv_invert.sc
 #                     drv_power.sc        map_sel.sc
