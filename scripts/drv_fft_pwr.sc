@@ -166,7 +166,7 @@ for { set i 0 } { $i < $numloop } { incr i } {
 #		flush stdout
 
 		set retval [catch \
- 	    { exec radarfft -l $lenfft -r $numbins -p $dcdpacked $xoffOpt $copt < $infile | \
+ 	    { exec radarfft -l $lenfft -r $numbins -p $dcdpacked $copt $xoffOpt < $infile | \
  		selectpnts -b $smpBytesOut -f $firsttokeep -g $lenkeep -s $lenfft     > $outfile } msg ]
 		puts $msg
 		flush stdout
