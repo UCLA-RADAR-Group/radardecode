@@ -40,9 +40,11 @@ cat tl4p2.cmp | awk '{if(($1-$2)>10000 || ($1-$2)<-10000) print ($1-$2)}' >> err
 
 
 if [ $(du -k err | cut -f1) -eq "0" ];then # if err is 0 then cw works
-    if [ $(du -k result_hd2p1.cmp | cut -f1) -neq "0" ]; then # just to check atleast one file exist and is not empty as all empty files will also give a cw_param_1 as 1
         cw_param_1=1; 
-    fi 
+fi
+
+if [ $(du -k result_hd2p1.cmp | cut -f1) -eq "0" ];then # if even a single file is 0 then the code didn't work but prev if would have given a correct result
+    cw_param_1=0;
 fi
 
 #1k u4 DATA==============================
