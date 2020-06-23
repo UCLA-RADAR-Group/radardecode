@@ -59,6 +59,8 @@ This repository contains a portable and compact version of the radar processing 
 
   % make tests
 
+- Successfully tested on CentOS 7.3.1611/7.5.1804, Ubuntu 12.04.5/16.04.5/20.04, MacOS 10.11.6/10.15.5.  
+
 # Basic usage
 
 - To process continuous wave data into power spectra:  
