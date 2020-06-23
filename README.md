@@ -61,15 +61,19 @@ This repository contains a portable and compact version of the radar processing 
 
 # Basic usage
 
-- for cw data to get the fft powers in two polarizations:  
-- %drv_cw.sc controlfile firstscan lastscan  
+- To process continuous wave data into power spectra:  
 
+  % drv_cw.sc controlfile firstscan lastscan
+  % [e.g.,] drv_cw.sc drvcw.dat 1 1
 
-- for delay-doppler data to get the images:  
-- %export DRVSB=controlfile OR sbdrv controlfile  
-- %drv_all.sc [-d -c] 1st_file numfiles  
-- %drv_mapmsc.sc {opts} file1 numfiles toavg map/row {newRowLen} {newColLen}{colOff}  
+- To process delay-doppler data into images:   
 
+  % export DRVSB=controlfile 
+  % drv_all.sc [-d -c] 1st_file numfiles  
+  % [e.g.,] drv_all.sc 1 1 
+  % drv_mapmsc.sc {opts} file1 numfiles toavg map/row {newRowLen} {newColLen}{colOff}  
+
+  
 # Credits
 
 Most of the software was written by Phil Perillat.  This repository was created by Jean-Luc Margot and uploaded to a CVS server in 2005 and to GitHub in 2019.  It was brought back in sync with the current revision (r2007) of aosoft by Sanjana Prabhu Desai and Jean-Luc Margot in 2020.
