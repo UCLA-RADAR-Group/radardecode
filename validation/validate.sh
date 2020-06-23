@@ -7,7 +7,6 @@ u4_param_1=0
 #1 run p1 data=============================
 cd cw
 drv_cw.sc drvcw.result 1 1
-sleep 2
 
 od -f test_64.p1 > test.tmp1
 od -f result_64.p1 > result.tmp1
@@ -53,9 +52,7 @@ cd ..
 cd u4
 export DRVSB=drv.1k
 drv_all.sc 1 1
-sleep 2
 drv_mapmsc.sc 1 1 1 1
-sleep 2
 mv Fits/f1x1.fit Fits/result.fits
 python3 ../pixvalue.py u4 > result.val1
 paste result.val1 test.val1 > val1
