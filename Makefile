@@ -1,5 +1,6 @@
 #
 #       all scripts and executables will be placed in GLOBDIR
+#       compilation and link flags are defined in src/Makefile
 #
 SHELL=/bin/csh
 CC=gcc

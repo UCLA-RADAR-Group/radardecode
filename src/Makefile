@@ -1,10 +1,10 @@
 #
-#	Make one or more programs from the source
-#       executables will be placed in GLOBDIR
+#       all scripts and executables will be placed in GLOBDIR defined in ../Makefile
+#       compilation and link flags are defined here
 #
 SHELL=/bin/csh
-CFLAGS=-O4 -I. -I../include -I${HOME}/include  -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DLINUX -I/opt/local/include
-LFLAGS=-L$(HOME)/lib -L/opt/local/lib
+CFLAGS=-O4 -I. -I../include -I/opt/local/include
+LFLAGS=-L/opt/local/lib
 
 
 all: radardecode rotate selectpnts scaletosigma makefits mapsmerge radarfft avgdata stripVme unpriV zerofill fftfilter power_ao convdatatype
