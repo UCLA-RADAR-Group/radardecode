@@ -3,8 +3,8 @@
 This repository contains a portable and compact version of the radar processing software developed at the Arecibo Observatory.  Our goals are threefold:
 
 1. to provide a self-contained version of the software that can be easily installed outside of Arecibo's computing environment.  The code base is an order of magnitude smaller in size than the aosoft code base.  
-2. to improve the portability of the software.  We introduced modifications that allow the code to compile and execute on Linux and MacOS.  
-3. to encourage development and facilitate maintenance.  The GitHub repository allows users to easily compare versions and create pull requests for bug fixes or new features.  
+2. to improve portability.  We introduced modifications that allow compilation and execution on both Linux and MacOS.  
+3. to encourage development and facilitate maintenance.  This repository allows users to easily create branches and create pull requests for bug fixes or new features.  
 
 
 # Requirements
