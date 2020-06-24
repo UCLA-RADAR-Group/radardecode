@@ -19,7 +19,7 @@ scripts: FORCE
 src: FORCE
 	cd src && $(MAKE)
 
-tests:
+tests: FORCE
 	cd tests; ./validate.sh
 
 clean:
