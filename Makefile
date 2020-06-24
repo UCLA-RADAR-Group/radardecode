@@ -20,7 +20,7 @@ src: FORCE
 	cd src && $(MAKE)
 
 tests:
-	cd validation; ./validate.sh
+	cd tests; ./validate.sh
 
 clean:
 	cd src && $(MAKE) clean

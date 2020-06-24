@@ -79,10 +79,10 @@ if [ $(du -k err | cut -f1) -eq "0" ];then u4_param_1=1; else u4_param_1=0; fi
 echo "================================================="
 echo "=                    RESULTS                    ="
 echo "================================================="
-if [ $cw_param_1 -eq 1 ]; then echo " doppler processing works "; fi
-if [ $u4_param_1 -eq 1 ]; then echo " delay-doppler processing works"; fi
+if [ $cw_param_1 -eq 1 ]; then echo " doppler processing test PASSED "; fi
+if [ $u4_param_1 -eq 1 ]; then echo " delay-doppler processing test PASSED "; fi
 
-if [ $cw_param_1 -eq 0 ]; then echo " doppler processing does not work "; fi
-if [ $u4_param_1 -eq 0 ]; then echo " delay-doppler processing does not work"; fi
+if [ $cw_param_1 -eq 0 ]; then echo " doppler processing test FAILED "; fi
+if [ $u4_param_1 -eq 0 ]; then echo " delay-doppler processing test FAILED "; fi
 
 cd ..
