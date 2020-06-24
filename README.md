@@ -78,7 +78,7 @@ This repository contains a portable and compact version of the radar processing 
   
 # Credits
 
-Most of the software was written by Phil Perillat.  This repository was created by Jean-Luc Margot and uploaded to a CVS server in 2005 and to GitHub in 2019.  It was brought back in sync with the current revision (r2007) of aosoft by Sanjana Prabhu Desai and Jean-Luc Margot in 2020.
+Most of the software was written by Phil Perillat.  This repository was created by Jean-Luc Margot and uploaded to a CVS server circa 2003 and to GitHub in 2019.  It was brought back in sync with the current revision (r2007) of aosoft by Sanjana Prabhu Desai and Jean-Luc Margot in 2020.
 
 This version is based on aosoft GitHub version  
 https://github.com/UCLA-RADAR-Group/aosoft/commit/fc8dec2e3263f7588f930bfde9a1ddfedb01f753  
