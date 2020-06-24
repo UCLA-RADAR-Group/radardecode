@@ -15,24 +15,31 @@ This repository contains a portable and compact version of the radar processing 
 
     - Install with your package manager:
 
-       - RedHat/CentOS:  
-       % sudo yum install fftw fftw-devel  
+       - RedHat/CentOS: 
        (include file at /usr/include/, library at /usr/lib64/)  
+       ```sh
+       sudo yum install fftw fftw-devel  
+       ```
     
        - Debian/Ubuntu:  
-       % sudo apt-get install libfftw3-3 libfftw3-dev  
        (include file at /usr/include/, library at /usr/lib/)  
+       ```sh
+       sudo apt-get install libfftw3-3 libfftw3-dev  
+       ```
     
        - MacOS  
-       % sudo port install fftw-3-single  
        (include file at /opt/local/include/, library at /opt/local/lib/)  
+       ```sh
+       sudo port install fftw-3-single  
+       ```
     
     - Install from source:  
-
-       % wget http://www.fftw.org/fftw-3.3.8.tar.gz  
-       % tar xvf fftw-3.3.8.tar.gz  
-       % ./configure --enable-float  
-       % make; make install    
+       ```sh
+       wget http://www.fftw.org/fftw-3.3.8.tar.gz  
+       tar xvf fftw-3.3.8.tar.gz  
+       ./configure --enable-float  
+       make; make install
+       ```
   
 
 # Installation procedure
@@ -40,40 +47,48 @@ This repository contains a portable and compact version of the radar processing 
 - Download repository  
 
   With https:  
-  % git clone https://github.com/UCLA-RADAR-Group/radardecode.git  
-  % cd radardecode  
+  ```sh
+  git clone https://github.com/UCLA-RADAR-Group/radardecode.git  
+  cd radardecode  
+  ```
   
   With ssh:  
-  % git clone git@github.com:UCLA-RADAR-Group/radardecode.git  
-  % cd radardecode  
+  ```sh
+  git clone git@github.com:UCLA-RADAR-Group/radardecode.git  
+  cd radardecode  
+  ```
 
 - Specify the target location for scripts and executables.
 
   Edit the value of GLOBDIR in top-level Makefile if necessary (default is $(HOME)/bin)
   
 - Compile  
-
-  % make  
+  ```sh
+  make  
+  ```
 
 - Run tests
-
-  % make tests
+  ```sh
+  make tests  
+  ```
 
 - Successfully tested on CentOS 7.3.1611/7.5.1804, Ubuntu 12.04.5/16.04.5/20.04, MacOS 10.11.6/10.15.5.  
 
 # Basic usage
 
 - To process continuous wave data into power spectra:  
-
-  % drv_cw.sc controlfile firstscan lastscan  
-  % [e.g.,] drv_cw.sc drvcw.dat 1 1  
+  ```sh
+  drv_cw.sc controlfile firstscan lastscan  
+  [e.g.,] drv_cw.sc drvcw.dat 1 1  
+  ```
 
 - To process delay-doppler data into images:   
-
-  % export DRVSB=controlfile  
-  % drv_all.sc [-d -c] 1st_file numfiles    
-  % [e.g.,] drv_all.sc 1 1   
-  % drv_mapmsc.sc {opts} file1 numfiles toavg map/row {newRowLen} {newColLen}{colOff}  
+  ```sh
+  export DRVSB=controlfile  
+  drv_all.sc [-d -c] 1st_file numfiles    
+  [e.g.,] drv_all.sc 1 1   
+  drv_mapmsc.sc {opts} file1 numfiles toavg map/row {newRowLen} {newColLen}{colOff}  
+  ```
 
   
 # Credits
