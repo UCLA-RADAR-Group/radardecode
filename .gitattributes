@@ -1,0 +1,3 @@
+*.sc linguist-language=Shell
+*.1k linguist-language=Other
+*.h linguist-language=C
