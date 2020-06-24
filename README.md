@@ -15,8 +15,8 @@ This repository contains a portable and compact version of the radar processing 
 
     - Install with your package manager:
 
-       - RedHat/CentOS: 
-       (include file at /usr/include/, library at /usr/lib64/)  
+       - RedHat/CentOS:   
+       (include file at /usr/include/, library at /usr/lib64/)    
        ```sh
        sudo yum install fftw fftw-devel  
        ```
@@ -27,7 +27,7 @@ This repository contains a portable and compact version of the radar processing 
        sudo apt-get install libfftw3-3 libfftw3-dev  
        ```
     
-       - MacOS  
+       - MacOS:  
        (include file at /opt/local/include/, library at /opt/local/lib/)  
        ```sh
        sudo port install fftw-3-single  
@@ -83,7 +83,7 @@ This repository contains a portable and compact version of the radar processing 
   ```
 
 - To process delay-doppler data into images:   
-  ```sh
+  ```bash
   export DRVSB=controlfile  
   drv_all.sc [-d -c] 1st_file numfiles    
   [e.g.,] drv_all.sc 1 1   
