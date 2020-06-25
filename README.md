@@ -96,3 +96,13 @@ Most of the software was written by Phil Perillat.  This repository was created 
 
 This version is based on aosoft GitHub version  
 https://github.com/UCLA-RADAR-Group/aosoft/commit/fc8dec2e3263f7588f930bfde9a1ddfedb01f753  
+
+# Further reading  
+Additional information about planetary radar astronomy can be found at [http://radarastronomy.org](http://radarastronomy.org).
+
+# Contact  
+Please send comments and bug reports to:  
+
+Jean-Luc Margot  
+University of California, Los Angeles  
+jlm@astro.ucla.edu
