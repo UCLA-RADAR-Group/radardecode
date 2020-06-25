@@ -6,7 +6,7 @@ This repository contains a portable and compact version of the radar processing 
 2. to improve portability.  We introduced modifications that allow compilation and execution on both Linux and MacOS.  
 3. to encourage development and facilitate maintenance.  This repository allows users to easily create branches and create pull requests for bug fixes or new features.  
 
-The code includes more than 7,000 lines of C code. Most of this code has been incorporated in the code that is used to operate the NASA JPL radar backend.
+The code includes more than 7,000 lines of C code. Most of this code has been incorporated in the code that is used to process data from the NASA JPL radar backend.
 
 # Requirements
 
